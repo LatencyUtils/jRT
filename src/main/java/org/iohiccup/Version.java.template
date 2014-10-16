@@ -1,0 +1,10 @@
+/**
+
+ */
+
+package org.azulsystems;
+
+public final class Version {
+    public static final String version="$VERSION$";
+    public static final String build_time="$BUILD_TIME$";
+}

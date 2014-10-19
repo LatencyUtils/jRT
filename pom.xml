@@ -19,7 +19,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.template.file>src/main/java/org/iohiccup/Version.java.template</version.template.file>
-        <version.file>src/main/java/org/azulsystems/Version.java</version.file>
+        <version.file>src/main/java/org/iohiccup/Version.java</version.file>
     </properties>    
 
     <build>
@@ -237,13 +237,7 @@
             <artifactId>HdrHistogram</artifactId>
             <version>1.2.1</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.LatencyUtils</groupId>
-            <artifactId>LatencyUtils</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
-        </dependency>
-        -->
+        
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>

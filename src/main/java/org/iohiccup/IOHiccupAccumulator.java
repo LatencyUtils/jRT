@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+import org.HdrHistogram.AtomicHistogram;
 
 /**
  *
@@ -17,74 +18,50 @@ import java.util.WeakHashMap;
  */
 
 /*
- * An naive implementation.
- *
- * Implementation of latency counter in sampling manner (save only current one)
- * Consumer thread read only last one, and all latency values between reading 
- * will lost.
+ * 
  */
 public class IOHiccupAccumulator {
-    /*
-     * Should be a zero in case last put timestamp was when write?
-     */
-    static Map<IOHiccupSocketPresentation, IOHicHolder> i2o = new HashMap<IOHiccupSocketPresentation, IOHicHolder>();
+
+    static WeakHashMap<SocketImpl, IOHic> sockHiccups = new WeakHashMap<SocketImpl, IOHic>();
     
-    /*
-    // place holder to call from SocketImpl.constructor
-    public static void initializeIOHicHolder(SocketImpl sock) {
-        
-    }
-    */
-    
-    public static void initializeIOHicHolderIfNeed(IOHiccupSocketPresentation sockImpl) {
-        if (!Collections.synchronizedMap(i2o).containsKey(sockImpl)) {
-            long time = System.nanoTime();
-            IOHicHolder preHic = new IOHicHolder();
-            preHic.hic = preHic.new IOHic();
-            preHic.hic.endTime = time;
-            preHic.hic.latency = 0;
-            preHic.lastLatencyStartTimestamp = time;
-            Collections.synchronizedMap(i2o).put(sockImpl, preHic);
+    private static IOHic getSockHic(SocketImpl sock) {
+        IOHic hic = Collections.synchronizedMap(sockHiccups).get(sock);
+        if (null == hic) {
+            hic = new IOHic();
+            Collections.synchronizedMap(sockHiccups).put(sock, hic);
         }
+        return hic;
     }
     
-    public static void putTimestampReadAfter(String addr, int port) {
-        IOHiccupSocketPresentation sockImpl = new IOHiccupSocketPresentation(addr, port);
-        initializeIOHicHolderIfNeed(sockImpl);
-        Collections.synchronizedMap(i2o).get(sockImpl).lastLatencyStartTimestamp = System.nanoTime();
+    public static void putTimestampReadAfter(SocketImpl sock) {
+        IOHic hic = getSockHic(sock);
+        hic.readTime = System.nanoTime();
+        hic.lastRead = true;
     }
     
-    public static void putTimestampWriteBefore(String addr, int port) {
-        IOHiccupSocketPresentation sockImpl = new IOHiccupSocketPresentation(addr, port);
-        initializeIOHicHolderIfNeed(sockImpl);
-        long time = System.nanoTime();
-        Collections.synchronizedMap(i2o).get(sockImpl).hic.latency = time - Collections.synchronizedMap(i2o).get(sockImpl).lastLatencyStartTimestamp;
-        Collections.synchronizedMap(i2o).get(sockImpl).hic.endTime = time;
+    public static void putTimestampWriteBefore(SocketImpl sock) {
+        IOHic hic = getSockHic(sock);
+        hic.writeTime = System.nanoTime();
+        if (hic.lastRead && (hic.latency = hic.writeTime - hic.readTime) > 0) {
+//            i2oHistogram.recordValue(hic.latency);
+            IOHiccup.ls.recordLatency(hic.latency);
+        }
+        hic.lastRead = false;
     }
     
-    public static void putTimestampWriteAfter(String addr, int port) {
+    public static void putTimestampWriteAfter(SocketImpl sock) {
         System.out.println("** READ o2i case: <isn't implemented yet>");
         System.out.println("   you can remove -o2i option for now. It will be coming soon :)");
     }
     
-    public static void putTimestampReadBefore(String addr, int port) {
+    public static void putTimestampReadBefore(SocketImpl sock) {
         System.out.println("** WRITE o2i case: <isn't implemented yet>");
         System.out.println("   you can remove -o2i option for now. It will be coming soon :)");
     }
     
-    public static Map<IOHiccupSocketPresentation, IOHicHolder> getI2O() {
-        return i2o;
-    }
-    
     public static String dumpIOHiccups() {
         StringBuilder sb = new StringBuilder();
-        for (IOHiccupSocketPresentation sock : Collections.synchronizedMap(i2o).keySet()) {
-            sb.append("\t" + sock);
-            sb.append(" ");
-            IOHicHolder val = Collections.synchronizedMap(i2o).get(sock);
-            sb.append(val.hic);
-            sb.append("\n");
-        }
+
         return sb.toString();
     }
     

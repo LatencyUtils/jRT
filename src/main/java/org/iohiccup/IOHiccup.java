@@ -5,10 +5,18 @@
  */
 package org.iohiccup;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.instrument.Instrumentation;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.HdrHistogram.Histogram;
+import org.HdrHistogram.HistogramLogWriter;
+import org.LatencyUtils.LatencyStats;
+
 
 /**
  *
@@ -17,6 +25,8 @@ import java.util.Arrays;
 
 
 public class IOHiccup {
+    
+    public static LatencyStats ls;
     
     public static IOHiccupConfiguration configuration;
 
@@ -28,6 +38,8 @@ public class IOHiccup {
     public static void premain(String agentArgument, Instrumentation instrumentation) {
         configuration = new IOHiccupConfiguration();
         
+        System.out.println("premain:");
+        
         if (null != agentArgument) {
             for (String v : agentArgument.split(",")) {
                 String[] vArr = v.split("=");
@@ -38,6 +50,7 @@ public class IOHiccup {
                 if (Arrays.asList(new String[]{"-h","--help","help","h"}).contains(vArr[0])) {
                     System.out.println("todo: print here options :P, now only default values...");
                 }
+                //TODO add port/address filtering
 //                if (something) {
 //                    configuration.something = something
 //                }
@@ -45,23 +58,38 @@ public class IOHiccup {
         }
         
         instrumentation.addTransformer(new IOHiccupTransformer(configuration));
-
-        final IOHiccupHistogramWriter writer = new IOHiccupHistogramWriter();
-        writer.start();
         
         //Some temporary place to print collected statistic.
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run() {
-                writer.isAlive = false;
                 System.out.println(" \\n");
                 System.out.println("***************************************************************");
                 System.out.println("ioHiccupStatistic: ");
-                System.out.println("**************************************************************");
-//                System.out.println(ioHiccupDatas.toString());
+                System.out.println("***************************************************************");
             }
             
         });
+        
+        ls = new LatencyStats();
+        
+        (new Thread() {
+            @Override
+            public void run() {
+                HistogramLogWriter log = null;
+                try {
+                    log = new HistogramLogWriter(new File("1.hlog"));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(IOHiccup.class.getName()).log(Level.SEVERE, null, ex);
+                    System.exit(1);
+                }
+                while (true) {
+                    ls.forceIntervalSample();
+                    Histogram intervalHistogram = ls.getIntervalHistogram();
+                    log.outputIntervalHistogram(intervalHistogram);
+                }
+            }
+        }).start();
     }
 
 }

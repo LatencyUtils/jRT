@@ -2,7 +2,7 @@
 
  */
 
-package org.azulsystems;
+package org.iohiccup;
 
 public final class Version {
     public static final String version="$VERSION$";

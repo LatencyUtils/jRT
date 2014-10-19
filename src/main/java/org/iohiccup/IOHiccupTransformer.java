@@ -44,6 +44,7 @@ public class IOHiccupTransformer implements ClassFileTransformer {
 
         //FIXME: DO NOT NEED actual to iterate over all methods, we can instrument only that we want
         CtClass cl = null;
+
         try {
             cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
             if (cl.isInterface() == false) {
@@ -75,18 +76,19 @@ public class IOHiccupTransformer implements ClassFileTransformer {
     private void doMethod(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("read")) {
             if (configuration.i2oEnabled) {
-                method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadAfter(impl.address.getHostName(), impl.port);");
+                System.out.println("1");
+                method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadAfter(impl);");
             }
             if (configuration.o2iEnabled) {
-                method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadBefore(impl.address.getHostName(), impl.port);");
+                method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadBefore(impl);");
             }
         }
         if (method.getName().startsWith("write")) {
             if (configuration.i2oEnabled) {
-                method.insertBefore("org.iohiccup.IOHiccupAccumulator.putTimestampWriteBefore(impl.address.getHostName(), impl.port);");
+                method.insertBefore("org.iohiccup.IOHiccupAccumulator.putTimestampWriteBefore(impl);");
             }
             if (configuration.o2iEnabled) {
-                method.insertBefore("org.iohiccup.IOHiccupAccumulator.putTimestampWriteAfter(impl.address.getHostName(), impl.port);");
+                method.insertBefore("org.iohiccup.IOHiccupAccumulator.putTimestampWriteAfter(impl);");
             }
         }
     }

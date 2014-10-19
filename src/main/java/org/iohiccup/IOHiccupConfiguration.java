@@ -11,7 +11,7 @@ package org.iohiccup;
  */
 public class IOHiccupConfiguration {
     public boolean i2oEnabled   = true;
-    public boolean o2iEnabled   = false;
+    public boolean o2iEnabled   = true;
     public String matchPort     = null; // null means do not filter them
     public String matchAddress  = null; // null means do not filter them
 }

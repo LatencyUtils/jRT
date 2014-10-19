@@ -35,28 +35,32 @@ public class IOHiccupAccumulator {
     
     public static void putTimestampReadAfter(SocketImpl sock) {
         IOHic hic = getSockHic(sock);
-        hic.readTime = System.nanoTime();
-        hic.lastRead = true;
+        hic.i2oReadTime = System.nanoTime();
+        hic.i2oLastRead = true;
     }
     
     public static void putTimestampWriteBefore(SocketImpl sock) {
         IOHic hic = getSockHic(sock);
-        hic.writeTime = System.nanoTime();
-        if (hic.lastRead && (hic.latency = hic.writeTime - hic.readTime) > 0) {
-//            i2oHistogram.recordValue(hic.latency);
-            IOHiccup.ls.recordLatency(hic.latency);
+        hic.i2oWriteTime = System.nanoTime();
+        if (hic.i2oLastRead && (hic.i2oLatency = hic.i2oWriteTime - hic.i2oReadTime) > 0) {
+            IOHiccup.i2oLS.recordLatency(hic.i2oLatency);
         }
-        hic.lastRead = false;
+        hic.i2oLastRead = false;
     }
     
     public static void putTimestampWriteAfter(SocketImpl sock) {
-        System.out.println("** READ o2i case: <isn't implemented yet>");
-        System.out.println("   you can remove -o2i option for now. It will be coming soon :)");
+        IOHic hic = getSockHic(sock);
+        hic.o2iReadTime = System.nanoTime();
+        hic.o2iLastWrite = true;
     }
     
     public static void putTimestampReadBefore(SocketImpl sock) {
-        System.out.println("** WRITE o2i case: <isn't implemented yet>");
-        System.out.println("   you can remove -o2i option for now. It will be coming soon :)");
+        IOHic hic = getSockHic(sock);
+        hic.o2iWriteTime = System.nanoTime();
+        if (hic.o2iLastWrite && (hic.o2iLatency = hic.o2iWriteTime - hic.o2iReadTime) > 0) {
+            IOHiccup.o2iLS.recordLatency(hic.o2iLatency);
+        }
+        hic.o2iLastWrite = false;
     }
     
     public static String dumpIOHiccups() {

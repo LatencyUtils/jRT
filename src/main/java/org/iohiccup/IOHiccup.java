@@ -26,7 +26,8 @@ import org.LatencyUtils.LatencyStats;
 
 public class IOHiccup {
     
-    public static LatencyStats ls;
+    public static LatencyStats i2oLS;
+    public static LatencyStats o2iLS;
     
     public static IOHiccupConfiguration configuration;
 
@@ -71,22 +72,28 @@ public class IOHiccup {
             
         });
         
-        ls = new LatencyStats();
+        i2oLS = new LatencyStats();
+        o2iLS = new LatencyStats();
         
         (new Thread() {
             @Override
             public void run() {
-                HistogramLogWriter log = null;
+                HistogramLogWriter i2olog = null;
+                HistogramLogWriter o2ilog = null;
                 try {
-                    log = new HistogramLogWriter(new File("1.hlog"));
+                    i2olog = new HistogramLogWriter(new File("1.hlog"));
+                    o2ilog = new HistogramLogWriter(new File("2.hlog"));
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(IOHiccup.class.getName()).log(Level.SEVERE, null, ex);
                     System.exit(1);
                 }
                 while (true) {
-                    ls.forceIntervalSample();
-                    Histogram intervalHistogram = ls.getIntervalHistogram();
-                    log.outputIntervalHistogram(intervalHistogram);
+                    i2oLS.forceIntervalSample();
+                    Histogram intervalHistogram = i2oLS.getIntervalHistogram();
+                    i2olog.outputIntervalHistogram(intervalHistogram);
+                    o2iLS.forceIntervalSample();
+                    Histogram intervalHistogram2 = o2iLS.getIntervalHistogram();
+                    o2ilog.outputIntervalHistogram(intervalHistogram2);
                 }
             }
         }).start();

@@ -10,8 +10,13 @@ package org.iohiccup;
  * @author fijiol
  */
 public class IOHic {
-    public long latency;
-    public long readTime;
-    public long writeTime;
-    public boolean lastRead;
+    public long i2oLatency;
+    public long i2oReadTime;
+    public long i2oWriteTime;
+    public boolean i2oLastRead;
+    
+    public long o2iLatency;
+    public long o2iReadTime;
+    public long o2iWriteTime;
+    public boolean o2iLastWrite;
 }

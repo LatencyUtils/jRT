@@ -81,8 +81,8 @@ public class IOHiccup {
                 HistogramLogWriter i2olog = null;
                 HistogramLogWriter o2ilog = null;
                 try {
-                    i2olog = new HistogramLogWriter(new File("1.hlog"));
-                    o2ilog = new HistogramLogWriter(new File("2.hlog"));
+                    i2olog = new HistogramLogWriter(new File("i2o.hlog"));
+                    o2ilog = new HistogramLogWriter(new File("o2i.hlog"));
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(IOHiccup.class.getName()).log(Level.SEVERE, null, ex);
                     System.exit(1);

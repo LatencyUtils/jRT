@@ -76,7 +76,6 @@ public class IOHiccupTransformer implements ClassFileTransformer {
     private void doMethod(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("read")) {
             if (configuration.i2oEnabled) {
-                System.out.println("1");
                 method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadAfter(impl);");
             }
             if (configuration.o2iEnabled) {

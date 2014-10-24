@@ -7,10 +7,7 @@ package org.iohiccup;
 
 import java.net.SocketImpl;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.WeakHashMap;
-import org.HdrHistogram.AtomicHistogram;
 
 /**
  *

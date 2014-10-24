@@ -16,11 +16,12 @@ public abstract class PauseDetector extends Thread {
     ArrayList<PauseDetectorListener> highPriorityListeners = new ArrayList<PauseDetectorListener>(32);
     ArrayList<PauseDetectorListener> normalPriorityListeners = new ArrayList<PauseDetectorListener>(32);
 
-    private LinkedBlockingQueue<Object> messages = new LinkedBlockingQueue<Object>();
+    private final LinkedBlockingQueue<Object> messages = new LinkedBlockingQueue<Object>();
 
     volatile boolean stop = false;
 
     PauseDetector() {
+        this.setDaemon(true);
         this.start();
     }
 
@@ -132,6 +133,4 @@ public abstract class PauseDetector extends Thread {
             this.pauseEndTimeNsec = pauseEndTimeNsec;
         }
     }
-
-
 }

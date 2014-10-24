@@ -34,7 +34,7 @@ public class IOHiccupLogWriter extends Thread {
             System.exit(1);
         }
         try {
-            while (IOHiccup.isAlive) {
+            while (IOHiccup.isAlive && !Thread.interrupted()) {
                 IOHiccup.i2oLS.forceIntervalSample();
                 Histogram intervalHistogram = IOHiccup.i2oLS.getIntervalHistogram();
                 i2olog.outputIntervalHistogram(intervalHistogram);

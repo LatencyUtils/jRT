@@ -10,6 +10,7 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtField;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
@@ -37,6 +38,8 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         return doClass(className, clazz, bytes);
     }  
     
+    static final String iohic_field_name = "iohic";
+    
     private byte[] doClass(String name, Class clazz, byte[] b) {
         ClassPool pool = ClassPool.getDefault();
 
@@ -46,16 +49,29 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         CtClass cl = null;
 
         try {
+            CtClass iohicClass = pool.get(accumulatorImplementationPackage + "IOHic");
+            
             cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
             if (cl.isInterface() == false) {
+                
+                CtField field = new CtField(iohicClass, iohic_field_name, cl);
+                cl.addField(field);
 
                 CtBehavior[] methods = cl.getDeclaredBehaviors();
                 for (int i = 0; i < methods.length; i++) {
                     if (methods[i].isEmpty() == false) {
 
+                        System.out.println("TODO instrument : " + methods[i].getLongName());
+                        
                         if (methods[i].getLongName().endsWith("read(byte[],int,int,int)")
                                 || methods[i].getLongName().endsWith("write(byte[],int,int)")) {
-                            doMethod(name, methods[i]);
+                            doIOMethods(name, methods[i]);
+                        }
+                        
+//                        if (false)
+                        if (methods[i].getLongName().endsWith("SocketOutputStream(java.net.AbstractPlainSocketImpl)") ||
+                                methods[i].getLongName().endsWith("SocketInputStream(java.net.AbstractPlainSocketImpl)")) {
+                            doIOStreamsConstructor(name, methods[i]);
                         }
                     }
                 }
@@ -63,8 +79,9 @@ public class IOHiccupTransformer implements ClassFileTransformer {
             }
         } catch (Exception e) {
             System.err.println("Could not instrument  " + name
-                    + ",  exception : " + e.getMessage());
+                    + ",  exception : " + e + ":" + e.getMessage());
             System.err.flush();
+            e.printStackTrace();
         } finally {
             if (cl != null) {
                 cl.detach();
@@ -73,22 +90,34 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         return b;
     }
 
-    private void doMethod(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
+    static final String checkString = " if (null != this."+ iohic_field_name + ") ";
+    static final String accumulatorImplementationPackage = "org.iohiccup.";
+    static final String accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
+
+    private void doIOMethods(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("read")) {
             if (configuration.i2oEnabled) {
-                method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadAfter(impl);");
+                method.insertAfter(checkString + accumulatorImplementationClass + ".putTimestampReadAfter("+ iohic_field_name + ");");
             }
             if (configuration.o2iEnabled) {
-                method.insertAfter("org.iohiccup.IOHiccupAccumulator.putTimestampReadBefore(impl);");
+                method.insertAfter(checkString + accumulatorImplementationClass + ".putTimestampReadBefore("+ iohic_field_name + ");");
             }
         }
+
         if (method.getName().startsWith("write")) {
             if (configuration.i2oEnabled) {
-                method.insertBefore("org.iohiccup.IOHiccupAccumulator.putTimestampWriteBefore(impl);");
+                method.insertBefore(checkString + accumulatorImplementationClass + ".putTimestampWriteBefore("+ iohic_field_name + ");");
             }
             if (configuration.o2iEnabled) {
-                method.insertBefore("org.iohiccup.IOHiccupAccumulator.putTimestampWriteAfter(impl);");
+                method.insertBefore(checkString + accumulatorImplementationClass + ".putTimestampWriteAfter("+ iohic_field_name + ");");
             }
+        }
+    }
+    
+    private void doIOStreamsConstructor(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
+        if (method.getName().startsWith("SocketOutputStream") || method.getName().startsWith("SocketInputStream") ) {
+            System.out.println("stream constructor instrumented");
+            method.insertBefore(iohic_field_name + "= " + accumulatorImplementationClass + ".initializeIOHic(impl);");
         }
     }
     

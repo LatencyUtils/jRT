@@ -41,8 +41,7 @@ public class IOHiccupLogWriter extends Thread {
                 IOHiccup.o2iLS.forceIntervalSample();
                 Histogram intervalHistogram2 = IOHiccup.o2iLS.getIntervalHistogram();
                 o2ilog.outputIntervalHistogram(intervalHistogram2);
-                
-                Thread.sleep(5000);
+                Thread.sleep(IOHiccup.configuration.logWriterInterval);
             }
         } catch (InterruptedException ex) {
             //Nothing to do?

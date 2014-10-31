@@ -15,4 +15,8 @@ public class IOHiccupConfiguration {
     public String matchPort     = null; // null means do not filter them
     public String matchAddress  = null; // null means do not filter them
     public long logWriterInterval = 1000;
+    
+    public String remoteaddr = null;
+    public String localport = null;
+    public String remoteport = null;
 }

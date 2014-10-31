@@ -114,7 +114,8 @@ public class IOHiccupTransformer implements ClassFileTransformer {
     
     private void doIOStreamsConstructor(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("SocketOutputStream") || method.getName().startsWith("SocketInputStream") ) {
-            method.insertBefore(iohic_field_name + "= " + accumulatorImplementationClass + ".initializeIOHic(impl);");
+            method.insertBefore(iohic_field_name + "= " + accumulatorImplementationClass + 
+                    ".initializeIOHic(impl, impl.getInetAddress(), impl.getPort(), impl.getLocalPort());");
         }
     }
     

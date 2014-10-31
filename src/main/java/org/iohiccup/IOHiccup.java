@@ -23,17 +23,36 @@ public class IOHiccup {
     public static boolean isAlive = true;
 
     public static IOHiccupConfiguration configuration;
+    public static IOStatistic ioStat;
 
     public static void main(String[] args) throws UnsupportedEncodingException, IOException, InterruptedException {
         System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"
                 + "java -javaagent:ioHiccup.jar -Xbootclasspath/a:ioHiccup.jar -jar yourapp.jar");
     }
 
+    public static void printHelp() {
+        System.out.println("Some help message here");
+    }
+    
+    private static String fixupRegex(String str) {
+        if (true) {
+            return str;
+        }
+        
+        try {
+        "".matches(str);
+        } catch (Exception e) {
+            System.err.println("WARN: regex '" + str + "' is not understandable");
+            System.exit(1); //tempory
+            return null;
+        }
+        return str;
+    }
+    
     public static void premain(String agentArgument, Instrumentation instrumentation) {
         configuration = new IOHiccupConfiguration();
+        ioStat = new IOStatistic();
 
-        System.out.println("premain:");
-        
         startTime = System.currentTimeMillis();
 
         if (null != agentArgument) {
@@ -50,6 +69,20 @@ public class IOHiccup {
 //                if (something) {
 //                    configuration.something = something
 //                }
+                if (vArr[0].equals("remoteaddr")) {
+                    configuration.remoteaddr = fixupRegex(vArr[1]);
+                }
+                if (vArr[0].equals("localport")) {
+                    configuration.localport = fixupRegex(vArr[1]);
+                }
+                if (vArr[0].equals("remoteport")) {
+                    configuration.remoteport = fixupRegex(vArr[1]);
+                }
+                if (vArr[0].equals("log-interval")) {
+                    configuration.logWriterInterval = Long.valueOf(vArr[1]);
+                }
+                //delay start time
+                //how long to work
             }
         }
 
@@ -64,6 +97,7 @@ public class IOHiccup {
                 System.out.println("***************************************************************");
                 System.out.println("ioHiccupStatistic: ");
                 System.out.println("***************************************************************");
+                System.out.println(" " + IOHiccup.ioStat.wrappedSocket + " sockets was wrapped");
             }
 
         });

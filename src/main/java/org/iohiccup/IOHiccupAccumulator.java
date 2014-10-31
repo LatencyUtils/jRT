@@ -5,6 +5,7 @@
  */
 package org.iohiccup;
 
+import java.net.InetAddress;
 import java.net.SocketImpl;
 import java.util.Collections;
 import java.util.Map;
@@ -32,9 +33,51 @@ public class IOHiccupAccumulator {
         return hic;
     }
     
-    public static IOHic initializeIOHic(SocketImpl sock) {
-        IOHic iohic = getIOHic(sock);
+    private static boolean match(String a, String filter) {
+        //return a.matches(".*" + filter + ".*");
+        if (null == filter) {
+            return false;
+        }
+        return a.equals(filter);
+    }
+    public static IOHic initializeIOHic(SocketImpl sock, InetAddress remoteAddress, int remotePort, int localPort) {
+//        System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);
+        
+        IOHic iohic = null;
+        
+        if (sockHiccups.containsKey(sock)) {
+            return sockHiccups.get(sock);
+        } else {
+            iohic = new IOHic();
+            sockHiccups.put(sock, iohic);
+        }
+        
         //Decide to filter or not?
+        boolean match = true;
+        
+        if (null != IOHiccup.configuration.remoteaddr  && 
+                !match(remoteAddress.getHostAddress().toString(), IOHiccup.configuration.remoteaddr)) {
+            match = false;
+        }
+        
+        if (null != IOHiccup.configuration.remoteport && 
+                !match(String.valueOf(remotePort), IOHiccup.configuration.remoteport)) {
+            match = false;
+        }
+        
+        if (null != IOHiccup.configuration.localport && 
+                !match(String.valueOf(localPort), IOHiccup.configuration.localport)) {
+            match = false;
+        }
+        
+        if (!match) {
+            sockHiccups.put(sock, null);
+            
+            return null;
+        }
+        
+        ++IOHiccup.ioStat.wrappedSocket;
+        
         return iohic;
     }
     

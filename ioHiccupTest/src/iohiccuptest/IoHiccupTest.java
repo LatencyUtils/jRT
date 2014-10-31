@@ -26,12 +26,10 @@ import java.util.logging.Logger;
 class TestI {
 
     public final int count;
-    public final int iters;
     public final long delay;
 
-    public TestI(int count, int iters, long delay) {
+    public TestI(int count, long delay) {
         this.count = count;
-        this.iters = iters;
         this.delay = delay;
     }
 
@@ -40,6 +38,7 @@ class TestI {
 public class IoHiccupTest {
 
     private static final ArrayList<TestI> tests = new ArrayList<>();
+    private static long finishTime;
 
     private static String getUrlSource(String url) throws IOException {
         URL yahoo = new URL(url);
@@ -67,14 +66,17 @@ public class IoHiccupTest {
         boolean printHelp = false;
         for (String param : args) {
             String[] paramVals = param.split(":");
-            if (paramVals.length == 4 && paramVals[0].equals("-i")) {
-                tests.add(new TestI(Integer.valueOf(paramVals[1]), Integer.valueOf(paramVals[2]), Long.valueOf(paramVals[3])));
+            if (paramVals.length == 3 && paramVals[0].equals("-i")) {
+                tests.add(new TestI(Integer.valueOf(paramVals[1]), Long.valueOf(paramVals[2])));
+            } else 
+            if (paramVals.length == 2 && paramVals[0].equals("-t")) {
+                finishTime = System.currentTimeMillis() + Long.valueOf(paramVals[1]);
             } else {
                 printHelp = true;
             }
         }
         if (printHelp) {
-            System.out.println("Usage ioHiccupTest -i:<count>:<iterations>:<delays> -i... -i...");
+            System.out.println("Usage ioHiccupTest -t:<ms> -i:<count>:<delays> -i... -i...");
             System.exit(1);
         }
 
@@ -85,7 +87,7 @@ public class IoHiccupTest {
         final CountDownLatch latch = new CountDownLatch(workersQuantity);
         for (TestI t : tests) {
             for (int i = 0; i < t.count; ++i) {
-                doSite(latch, getRandomUrl(), t.iters, t.delay);
+                doSite(latch, getRandomUrl(), t.delay);
             }
         }
 
@@ -108,19 +110,21 @@ public class IoHiccupTest {
 
     static int threadId = 0;
     
-    public static void doSite(final CountDownLatch latch, final String url, final int iterations, final long delay) {
+    public static void doSite(final CountDownLatch latch, final String url, final long delay) {
+        
         exec.submit(new Runnable() {
             
             @Override
             public void run() {
                 final int tid =  ++threadId;
                 try {
-                    for (int i = 0; i < iterations; ++i) {
+                    int i =0;
+                    while (System.currentTimeMillis() < finishTime) {
                         try {
                             final int length = getUrlSource(url).length();
                             
                             System.out.println(" Thread " + tid + " of " + workersQuantity + ": [ iteration " + (i + 1) 
-                                    + " of " + iterations + " ]: getting context of site... " + url + " has been got " + length + " bytes");
+                                    + " ]: getting context of site... " + url + " has been got " + length + " bytes");
                             
                             Thread.sleep(delay);
                         } catch (InterruptedException ex) {
@@ -129,6 +133,7 @@ public class IoHiccupTest {
                             System.err.println("(" + url + ") ER: " + ex);
                             Logger.getLogger(IoHiccupTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        ++i;
                     }
                 } finally {
                     latch.countDown();

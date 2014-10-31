@@ -61,8 +61,6 @@ public class IOHiccupTransformer implements ClassFileTransformer {
                 for (int i = 0; i < methods.length; i++) {
                     if (methods[i].isEmpty() == false) {
 
-                        System.out.println("TODO instrument : " + methods[i].getLongName());
-                        
                         if (methods[i].getLongName().endsWith("read(byte[],int,int,int)")
                                 || methods[i].getLongName().endsWith("write(byte[],int,int)")) {
                             doIOMethods(name, methods[i]);
@@ -116,7 +114,6 @@ public class IOHiccupTransformer implements ClassFileTransformer {
     
     private void doIOStreamsConstructor(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("SocketOutputStream") || method.getName().startsWith("SocketInputStream") ) {
-            System.out.println("stream constructor instrumented");
             method.insertBefore(iohic_field_name + "= " + accumulatorImplementationClass + ".initializeIOHic(impl);");
         }
     }

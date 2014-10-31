@@ -34,14 +34,28 @@ public class IOHiccupLogWriter extends Thread {
             System.exit(1);
         }
         try {
+            i2olog.outputLegend();
+            o2ilog.outputLegend();
+            i2olog.outputStartTime(IOHiccup.startTime);
+            o2ilog.outputStartTime(IOHiccup.startTime);
+            
             while (IOHiccup.isAlive && !Thread.interrupted()) {
+                
+                long currentTime = System.currentTimeMillis();
+                
                 IOHiccup.i2oLS.forceIntervalSample();
                 Histogram intervalHistogram = IOHiccup.i2oLS.getIntervalHistogram();
+//                intervalHistogram.setStartTimeStamp(currentTime - IOHiccup.startTime);
                 i2olog.outputIntervalHistogram(intervalHistogram);
+                
                 IOHiccup.o2iLS.forceIntervalSample();
                 Histogram intervalHistogram2 = IOHiccup.o2iLS.getIntervalHistogram();
+//                intervalHistogram2.setStartTimeStamp(currentTime - IOHiccup.startTime);
                 o2ilog.outputIntervalHistogram(intervalHistogram2);
+                
+                
                 Thread.sleep(IOHiccup.configuration.logWriterInterval);
+                
             }
         } catch (InterruptedException ex) {
             //Nothing to do?

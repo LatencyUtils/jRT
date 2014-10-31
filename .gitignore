@@ -3,3 +3,6 @@
 *.jar
 /tmp
 
+/ioHiccupTest/build/
+/ioHiccupTest/nbproject/private/
+/ioHiccupTest/dist/

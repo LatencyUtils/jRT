@@ -17,6 +17,7 @@ import org.LatencyUtils.LatencyStats;
  */
 public class IOHiccup {
 
+    public static long startTime;
     public static LatencyStats i2oLS;
     public static LatencyStats o2iLS;
     public static boolean isAlive = true;
@@ -25,13 +26,15 @@ public class IOHiccup {
 
     public static void main(String[] args) throws UnsupportedEncodingException, IOException, InterruptedException {
         System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"
-                + "java -javaagent:ioHiccup.jar -jar yourapp.jar");
+                + "java -javaagent:ioHiccup.jar -Xbootclasspath/a:ioHiccup.jar -jar yourapp.jar");
     }
 
     public static void premain(String agentArgument, Instrumentation instrumentation) {
         configuration = new IOHiccupConfiguration();
 
         System.out.println("premain:");
+        
+        startTime = System.currentTimeMillis();
 
         if (null != agentArgument) {
             for (String v : agentArgument.split(",")) {

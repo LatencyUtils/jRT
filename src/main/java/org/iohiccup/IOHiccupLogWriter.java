@@ -45,12 +45,14 @@ public class IOHiccupLogWriter extends Thread {
                 
                 IOHiccup.i2oLS.forceIntervalSample();
                 Histogram intervalHistogram = IOHiccup.i2oLS.getIntervalHistogram();
-//                intervalHistogram.setStartTimeStamp(currentTime - IOHiccup.startTime);
+                intervalHistogram.setStartTimeStamp(intervalHistogram.getStartTimeStamp() - IOHiccup.startTime);
+                intervalHistogram.setEndTimeStamp(intervalHistogram.getEndTimeStamp() - IOHiccup.startTime);
                 i2olog.outputIntervalHistogram(intervalHistogram);
                 
                 IOHiccup.o2iLS.forceIntervalSample();
                 Histogram intervalHistogram2 = IOHiccup.o2iLS.getIntervalHistogram();
-//                intervalHistogram2.setStartTimeStamp(currentTime - IOHiccup.startTime);
+                intervalHistogram2.setStartTimeStamp(intervalHistogram2.getStartTimeStamp() - IOHiccup.startTime);
+                intervalHistogram2.setEndTimeStamp(intervalHistogram2.getEndTimeStamp() - IOHiccup.startTime);
                 o2ilog.outputIntervalHistogram(intervalHistogram2);
                 
                 

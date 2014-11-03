@@ -7,7 +7,6 @@ package org.iohiccup;
 
 import java.net.InetAddress;
 import java.net.SocketImpl;
-import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +40,7 @@ public class IOHiccupAccumulator {
         return a.equals(filter);
     }
     public static IOHic initializeIOHic(SocketImpl sock, InetAddress remoteAddress, int remotePort, int localPort) {
-//        System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);
+        System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);
         
         IOHic iohic = null;
         
@@ -55,8 +54,12 @@ public class IOHiccupAccumulator {
         //Decide to filter or not?
         boolean match = true;
         
+        System.out.println("To filter: " + remoteAddress.getHostAddress() + " ; " + remoteAddress.getHostName()
+         + " by " + IOHiccup.configuration.remoteaddr);
+        
         if (null != IOHiccup.configuration.remoteaddr  && 
-                !match(remoteAddress.getHostAddress().toString(), IOHiccup.configuration.remoteaddr)) {
+                !(match(remoteAddress.getHostAddress(), IOHiccup.configuration.remoteaddr) ||
+                  match(remoteAddress.getHostName(), IOHiccup.configuration.remoteaddr)  )) {
             match = false;
         }
         
@@ -76,7 +79,7 @@ public class IOHiccupAccumulator {
             return null;
         }
         
-        ++IOHiccup.ioStat.wrappedSocket;
+        ++IOHiccup.ioStat.processedSocket;
         
         return iohic;
     }

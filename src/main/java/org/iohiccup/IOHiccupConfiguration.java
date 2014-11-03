@@ -19,4 +19,7 @@ public class IOHiccupConfiguration {
     public String remoteaddr = null;
     public String localport = null;
     public String remoteport = null;
+    
+    public long startDelaying = 20; //miliseconds
+    public long workingTime = Long.MIN_VALUE; //infinity
 }

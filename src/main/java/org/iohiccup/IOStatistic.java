@@ -10,7 +10,7 @@ package org.iohiccup;
  * @author fijiol
  */
 public class IOStatistic {
-    public long wrappedSocket;
+    public long processedSocket;
     public long startTime;
     public long endTime;
 }

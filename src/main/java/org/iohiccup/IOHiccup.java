@@ -16,6 +16,9 @@ import org.LatencyUtils.LatencyStats;
  */
 public class IOHiccup {
 
+    public static volatile boolean initialized = false;
+    public static volatile boolean finishByError = false;
+    
     public static long startTime;
     public static LatencyStats i2oLS;
     public static LatencyStats o2iLS;
@@ -27,6 +30,7 @@ public class IOHiccup {
     public static void main(String[] args) throws UnsupportedEncodingException, IOException, InterruptedException {
         System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"
                 + "java -javaagent:ioHiccup.jar -Xbootclasspath/a:ioHiccup.jar -jar yourapp.jar");
+        System.exit(1);
     }
 
     private static String printKeys(String[] keys) {
@@ -74,6 +78,12 @@ public class IOHiccup {
     public static void premain(String agentArgument, Instrumentation instrumentation) {
         
         //Check here another instances and exit if then!
+        if (initialized) {
+            System.err.println("\nTrying to run multiple instances of ioHiccup simultaneously.\n"
+                    + "\nPlease run only one at the same time.\n\n");
+            finishByError = true;
+            System.exit(1);
+        }
         
         configuration = new IOHiccupConfiguration();
         ioStat = new IOStatistic();
@@ -122,6 +132,9 @@ public class IOHiccup {
 
             @Override
             public void run() {
+                if (finishByError) {
+                    return;
+                }
                 System.out.println(" \\n");
                 System.out.println("***************************************************************");
                 System.out.println("ioHiccupStatistic: ");
@@ -136,6 +149,8 @@ public class IOHiccup {
 
         IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter();
         ioHiccupLogWriter.start();
+        
+        initialized = true;
     }
     
     private static final String[] remoteaddr = {"-raddr", "remote-addr"};

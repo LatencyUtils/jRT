@@ -5,8 +5,6 @@
  */
 package org.iohiccup;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.instrument.Instrumentation;
 import org.LatencyUtils.LatencyStats;
 
@@ -50,9 +48,10 @@ public class IOHiccup {
         System.out.println("\t\twhere <args> is an comma separated list of arguments like arg1,arg2=val2 e.t.c\n");
         System.out.println("\t\tARGUMENTS:");
         System.out.println("\t\t  " + printKeys(help) + " \t\t to print help");
-        System.out.println("\t\t  " + printKeys(remoteaddr) + " \t\t to set filter of remote address");
-        System.out.println("\t\t  " + printKeys(remoteport) + " \t\t to set filter of remote port");
-        System.out.println("\t\t  " + printKeys(localport) + " \t\t to set filter of local port");
+        System.out.println("\t\t  " + printKeys(remoteaddr) + " \t\t to add filter by remote address");
+        System.out.println("\t\t  " + printKeys(remoteport) + " \t\t to add filter by remote port");
+        System.out.println("\t\t  " + printKeys(localport) + " \t\t to add filter by local port");
+        System.out.println("\t\t  " + printKeys(filterentry) + " \t\t to add filter by entry: <Local port>::<Remote address>:<Remote port> any part can be empty");
         System.out.println("\t\t  " + printKeys(loginterval) + " \t\t to set log sampling interval");
         System.out.println("\t\t  " + printKeys(startdelaying) + " \t\t to specify time delay to start ioHiccup");
         System.out.println("\t\t  " + printKeys(workingtime) + " \t\t to specify how long ioHiccup will work");
@@ -103,13 +102,59 @@ public class IOHiccup {
                     System.exit(0);
                 }
                 if (hasKey(remoteaddr, vArr[0])) {
-                    configuration.remoteaddr = fixupRegex(vArr[1]);
+                    configuration.filterEntries.add(
+                            new IOHiccupConfiguration.IOFilterEntry(null, vArr[1], null));
                 }
                 if (hasKey(localport, vArr[0])) {
-                    configuration.localport = fixupRegex(vArr[1]);
+                    configuration.filterEntries.add(
+                            new IOHiccupConfiguration.IOFilterEntry(vArr[1], null, null));
                 }
                 if (hasKey(remoteport, vArr[0])) {
-                    configuration.remoteport = fixupRegex(vArr[1]);
+                    configuration.filterEntries.add(
+                            new IOHiccupConfiguration.IOFilterEntry(null, null, vArr[1]));
+                }
+                if (hasKey(filterentry, vArr[0]) && vArr.length == 2) {
+                    boolean isCorrect = true;
+                    
+                    String localPort = null;
+                    String remoteAddr = null;
+                    String remotePort = null;
+                    
+                    String[] ports = vArr[1].split("::");
+                    
+                    if (ports.length == 2) {
+                        if (ports[0].length() > 0) {
+                            localPort = ports[0];
+                        }
+                        String[] remote = ports[1].split(":");
+                        
+                        if (remote.length >= 1) {
+                            if (remote[0].length() > 0) {
+                                remoteAddr = remote[0];
+                            } 
+                        }
+                        if (remote.length >= 2) {
+                            if (remote[1].length() > 0) {
+                                remotePort = remote[1];
+                            }
+                        } 
+                        if (remote.length > 2){
+                            isCorrect = false;
+                        }
+                    } else {
+                        isCorrect = false;
+                    }
+
+                    //System.out.println("'" + localPort + "'" + remoteAddr + "'" + remotePort + "'");
+                    
+                    if (!isCorrect) {
+                        System.err.println("Wrong " + printKeys(filterentry) + " format\n\n");
+                        printHelp();
+                        System.exit(1);
+                    }
+                    
+                    configuration.filterEntries.add(
+                            new IOHiccupConfiguration.IOFilterEntry(localPort, remoteAddr, remotePort));
                 }
                 if (hasKey(loginterval, vArr[0])) {
                     configuration.logWriterInterval = Long.valueOf(vArr[1]);
@@ -157,6 +202,7 @@ public class IOHiccup {
     private static final String[] loginterval = {"-si", "sample-interval"};
     private static final String[] remoteport = {"-rport", "remote-port"};
     private static final String[] localport = {"-lport", "local-port"};
+    private static final String[] filterentry = {"-f", "filter-entry"};
     private static final String[] help = {"-h", "--help", "help", "h"};
     private static final String[] startdelaying = {"-start", "start"};
     private static final String[] workingtime = {"-fin", "finish-after"};

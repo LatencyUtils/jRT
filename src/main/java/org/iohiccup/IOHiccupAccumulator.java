@@ -23,15 +23,6 @@ public class IOHiccupAccumulator {
 
     static Map<SocketImpl, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<SocketImpl, IOHic>());
     
-    private static IOHic getIOHic(SocketImpl sock) {
-        IOHic hic = sockHiccups.get(sock);
-        if (null == hic) {
-            hic = new IOHic();
-            sockHiccups.put(sock, hic);
-        }
-        return hic;
-    }
-    
     private static boolean match(String a, String filter) {
         //return a.matches(".*" + filter + ".*");
         if (null == filter) {
@@ -39,11 +30,37 @@ public class IOHiccupAccumulator {
         }
         return a.equals(filter);
     }
+    
+    private static boolean match(InetAddress remoteAddress, int remotePort, int localPort) {
+        
+        for (IOHiccupConfiguration.IOFilterEntry entry : IOHiccup.configuration.filterEntries) {
+            if (null != entry.remoteaddr  &&
+                    !match(remoteAddress.getHostAddress(), entry.remoteaddr) &&
+                    !match(remoteAddress.getHostName(), entry.remoteaddr)  ) {
+                return false;
+            }
+            if (null != entry.remoteport && 
+                    !match(String.valueOf(remotePort), entry.remoteport)) {
+                return false;
+            }
+            if (null != entry.localport && 
+                    !match(String.valueOf(localPort), entry.localport)) {
+                return false;
+            }
+        }
+        
+        //System.out.println("Calculate hiccups between " + remoteAddress + ":" + remotePort + " <-> " + "127.0.0.1:" + localPort); //Print on debug level?
+        
+        return true;
+    }    
+    
     public static IOHic initializeIOHic(SocketImpl sock, InetAddress remoteAddress, int remotePort, int localPort) {
-        System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);
+        //System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);;
         
         IOHic iohic = null;
         
+        try {
+            
         if (sockHiccups.containsKey(sock)) {
             return sockHiccups.get(sock);
         } else {
@@ -52,38 +69,23 @@ public class IOHiccupAccumulator {
         }
         
         //Decide to filter or not?
-        boolean match = true;
-        
-        System.out.println("To filter: " + remoteAddress.getHostAddress() + " ; " + remoteAddress.getHostName()
-         + " by " + IOHiccup.configuration.remoteaddr);
-        
-        if (null != IOHiccup.configuration.remoteaddr  && 
-                !(match(remoteAddress.getHostAddress(), IOHiccup.configuration.remoteaddr) ||
-                  match(remoteAddress.getHostName(), IOHiccup.configuration.remoteaddr)  )) {
-            match = false;
-        }
-        
-        if (null != IOHiccup.configuration.remoteport && 
-                !match(String.valueOf(remotePort), IOHiccup.configuration.remoteport)) {
-            match = false;
-        }
-        
-        if (null != IOHiccup.configuration.localport && 
-                !match(String.valueOf(localPort), IOHiccup.configuration.localport)) {
-            match = false;
-        }
-        
-        if (!match) {
-            sockHiccups.put(sock, null);
+        if (!match(remoteAddress, remotePort, localPort)) { 
+            //sockHiccups.put(sock, null); //??!
+            sockHiccups.remove(sock);
             
             return null;
         }
         
         ++IOHiccup.ioStat.processedSocket;
         
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        
         return iohic;
     }
-    
+
+
     public static void putTimestampReadAfter(IOHic hic) {
         hic.i2oReadTime = System.nanoTime();
         hic.i2oLastRead = true;

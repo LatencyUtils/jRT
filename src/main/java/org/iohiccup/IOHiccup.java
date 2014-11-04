@@ -6,6 +6,10 @@
 package org.iohiccup;
 
 import java.lang.instrument.Instrumentation;
+import java.net.SocketImpl;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.LatencyUtils.LatencyStats;
 
 /**
@@ -16,18 +20,22 @@ public class IOHiccup {
 
     public static volatile boolean initialized = false;
     public static volatile boolean finishByError = false;
+    public static long hiccupInstances = 0;
+    private static final String title = "";
     
-    public static long startTime;
-    public static LatencyStats i2oLS;
-    public static LatencyStats o2iLS;
-    public static boolean isAlive = true;
+    public long startTime;
+    public LatencyStats i2oLS;
+    public LatencyStats o2iLS;
+    public boolean isAlive = true;
 
-    public static IOHiccupConfiguration configuration;
-    public static IOStatistic ioStat;
-
+    public IOHiccupConfiguration configuration;
+    public IOStatistic ioStat;
+    
+    public Map<SocketImpl, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<SocketImpl, IOHic>());
+    
     public static void main(String[] args) {
         System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"
-                + "java -javaagent:ioHiccup.jar -Xbootclasspath/a:ioHiccup.jar -jar yourapp.jar");
+                + "java -javaagent:ioHiccup.jar -jar yourapp.jar");
         System.exit(1);
     }
 
@@ -42,9 +50,9 @@ public class IOHiccup {
         return sb.toString();
     }
     
-    public static void printHelp() {
+    public static void printHelpAndExit() {
         System.out.println("Usage:");
-        System.out.println("\tjava -jar ioHiccup.jar[=<args>] -Xbootclasspath/a:ioHiccup.jar -jar yourapp.jar\n");
+        System.out.println("\tjava -jar ioHiccup.jar[=<args>]  -jar yourapp.jar\n");
         System.out.println("\t\twhere <args> is an comma separated list of arguments like arg1,arg2=val2 e.t.c\n");
         System.out.println("\t\tARGUMENTS:");
         System.out.println("\t\t  " + printKeys(help) + " \t\t to print help");
@@ -55,9 +63,16 @@ public class IOHiccup {
         System.out.println("\t\t  " + printKeys(loginterval) + " \t\t to set log sampling interval");
         System.out.println("\t\t  " + printKeys(startdelaying) + " \t\t to specify time delay to start ioHiccup");
         System.out.println("\t\t  " + printKeys(workingtime) + " \t\t to specify how long ioHiccup will work");
-        
+        System.out.println("\t\t  " + printKeys(logprefix) + " \t\t to specify ioHiccup log prefix");
+        System.out.println("\t\t  " + printKeys(uuid) + " \t\t to specify ioHiccup inner ID (take <string>)");
+        System.out.println("\t\t  " + printKeys(i2oenabling) + " \t\t to calculate latency (take <boolean>)");
+        System.out.println("\t\t  " + printKeys(o2ienabling) + " \t\t to calculate latency (take <boolean>)");
+                
         System.out.println("\n");
         System.out.println("Please rerun application with proper CLI options.\n");
+        
+        finishByError = true;
+        System.exit(1);
     }
     
     private static String fixupRegex(String str) {
@@ -74,16 +89,10 @@ public class IOHiccup {
         return str;
     }
     
-    public static void premain(String agentArgument, Instrumentation instrumentation) {
+    public static ConcurrentHashMap<String, IOHiccup> ioHiccupWorkers = new ConcurrentHashMap<String, IOHiccup>();
+    
+    public void premаin(String agentArgument, Instrumentation instrumentation) {
         
-        //Check here another instances and exit if then!
-        if (initialized) {
-            System.err.println("\nTrying to run multiple instances of ioHiccup simultaneously.\n"
-                    + "\nPlease run only one at the same time.\n\n");
-            finishByError = true;
-            System.exit(1);
-        }
-
         configuration = new IOHiccupConfiguration();
         ioStat = new IOStatistic();
 
@@ -94,12 +103,10 @@ public class IOHiccup {
                 String[] vArr = v.split("=");
                 if (vArr.length > 2) {
                     System.out.println("Wrong format ioHiccup arguments.\n");
-                    printHelp();
-                    System.exit(1);
+                    printHelpAndExit();
                 }
                 if (hasKey(help, vArr[0])) {
-                    printHelp();
-                    System.exit(0);
+                    printHelpAndExit();
                 }
                 if (hasKey(remoteaddr, vArr[0])) {
                     configuration.filterEntries.add(
@@ -149,8 +156,7 @@ public class IOHiccup {
                     
                     if (!isCorrect) {
                         System.err.println("Wrong " + printKeys(filterentry) + " format\n\n");
-                        printHelp();
-                        System.exit(1);
+                        printHelpAndExit();
                     }
                     
                     configuration.filterEntries.add(
@@ -165,26 +171,44 @@ public class IOHiccup {
                 if (hasKey(workingtime, vArr[0])) {
                     configuration.workingTime = Long.valueOf(vArr[1]);
                 }
-                //delay start time
-                //how long to work
+                if (hasKey(logprefix, vArr[0])) {
+                    configuration.logPrefix = (vArr[1]);
+                }
+                if (hasKey(uuid, vArr[0])) {
+                    configuration.uuid = (vArr[1]);
+                }
+                if (hasKey(i2oenabling, vArr[0])) {
+                    configuration.i2oEnabled = Boolean.valueOf(vArr[1]);
+                }
+                if (hasKey(o2ienabling, vArr[0])) {
+                    configuration.o2iEnabled = Boolean.valueOf(vArr[1]);
+                }
             }
         }
-
-        instrumentation.addTransformer(new IOHiccupTransformer(configuration));
+        
+        ioHiccupWorkers.put(configuration.uuid, this);
+        
+        instrumentation.addTransformer(new IOHiccupTransformer(this));
                 
         //Some temporary place to print collected statistic.
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
-                if (finishByError) {
-                    return;
+                synchronized (IOHiccup.title) {
+                    if (finishByError) {
+                        return;
+                    }
+                    System.out.println("");
+                    System.out.println("***************************************************************");
+                    System.out.println("ioHiccup configuration: ");
+                    System.out.println("ioHiccup uid " + configuration.uuid);
+                    System.out.println("---------------------------------------------------------------");
+                    System.out.println("ioHiccupStatistic: ");
+                    System.out.println(" " + ioStat.processedSocket + " sockets was processed");
+                    System.out.println("***************************************************************");
+                    System.out.flush();
                 }
-                System.out.println(" \\n");
-                System.out.println("***************************************************************");
-                System.out.println("ioHiccupStatistic: ");
-                System.out.println("***************************************************************");
-                System.out.println(" " + IOHiccup.ioStat.processedSocket + " sockets was processed");
             }
 
         });
@@ -192,8 +216,23 @@ public class IOHiccup {
         i2oLS = new LatencyStats();
         o2iLS = new LatencyStats();
 
-        IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter();
-        ioHiccupLogWriter.start();
+        IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter(this);
+        ioHiccupLogWriter.start();    
+    }
+    
+    public static void premain(String agentArgument, Instrumentation instrumentation) {
+        
+        //Check here another instances and exit if then!
+        if (initialized) {
+            System.out.println("WARNING: multiple instances of ioHiccup was ran. (It's not well tested yet)");
+            //System.err.println("\nTrying to run multiple instances of ioHiccup simultaneously.\n"
+            //        + "\nPlease run only one at the same time.\n\n");
+            //finishByError = true;
+            //System.exit(1);
+        }
+        
+        IOHiccup ioHiccup = new IOHiccup();
+        ioHiccup.premаin(agentArgument, instrumentation);
         
         initialized = true;
     }
@@ -206,6 +245,10 @@ public class IOHiccup {
     private static final String[] help = {"-h", "--help", "help", "h"};
     private static final String[] startdelaying = {"-start", "start"};
     private static final String[] workingtime = {"-fin", "finish-after"};
+    private static final String[] logprefix = {"-lp", "log-prefix"};
+    private static final String[] uuid = {"-id", "uuid"};
+    private static final String[] i2oenabling = {"-i2o"};
+    private static final String[] o2ienabling = {"-o2i"};
 
     private static boolean hasKey(String[] list, String key) {
         for (String s : list) {

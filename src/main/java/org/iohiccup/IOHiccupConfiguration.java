@@ -12,11 +12,14 @@ import java.util.ArrayList;
  * @author fijiol
  */
 public class IOHiccupConfiguration {
+    
+    public String uuid = String.valueOf(++IOHiccup.hiccupInstances);
+    
     public boolean i2oEnabled   = true;
     public boolean o2iEnabled   = true;
-    public String matchPort     = null; // null means do not filter them
-    public String matchAddress  = null; // null means do not filter them
     public long logWriterInterval = 1000;
+    public String logPrefix = "hiccup." + uuid;
+    public boolean printExceptions = true;
 
     public static class IOFilterEntry {
         public String remoteaddr = null;
@@ -33,6 +36,6 @@ public class IOHiccupConfiguration {
     
     public ArrayList<IOFilterEntry> filterEntries  = new ArrayList<IOFilterEntry>();
     
-    public long startDelaying = 20; //miliseconds
-    public long workingTime = Long.MIN_VALUE; //infinity
+    public long startDelaying = 0;             //miliseconds
+    public long workingTime = Long.MAX_VALUE;  //infinity
 }

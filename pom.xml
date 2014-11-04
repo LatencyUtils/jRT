@@ -95,13 +95,13 @@
                     <archive>
                         <manifest>
                             <addClasspath>false</addClasspath>
-                            <mainClass>org.iohiccup.IOHiccup</mainClass>
+                            <mainClass>org.iohiccup.IOHiccupPremain</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>org.iohiccup.IOHiccup</Premain-Class>
-                            <Agent-Class>org.iohiccup.IOHiccup</Agent-Class>
+                            <Premain-Class>org.iohiccup.IOHiccupPremain</Premain-Class>
+                            <Agent-Class>org.iohiccup.IOHiccupPremain</Agent-Class>
                             <Class-Path>target/lib</Class-Path>
                             <Class-Path>lib</Class-Path>
                         </manifestEntries>

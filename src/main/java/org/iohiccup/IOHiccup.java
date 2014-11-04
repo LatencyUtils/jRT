@@ -27,7 +27,7 @@ public class IOHiccup {
     public static IOHiccupConfiguration configuration;
     public static IOStatistic ioStat;
 
-    public static void main(String[] args) throws UnsupportedEncodingException, IOException, InterruptedException {
+    public static void main(String[] args) {
         System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"
                 + "java -javaagent:ioHiccup.jar -Xbootclasspath/a:ioHiccup.jar -jar yourapp.jar");
         System.exit(1);
@@ -84,7 +84,7 @@ public class IOHiccup {
             finishByError = true;
             System.exit(1);
         }
-        
+
         configuration = new IOHiccupConfiguration();
         ioStat = new IOStatistic();
 
@@ -126,7 +126,7 @@ public class IOHiccup {
         }
 
         instrumentation.addTransformer(new IOHiccupTransformer(configuration));
-
+                
         //Some temporary place to print collected statistic.
         Runtime.getRuntime().addShutdownHook(new Thread() {
 

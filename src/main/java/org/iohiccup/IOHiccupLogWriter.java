@@ -1,7 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Written by Fedor Burdun of Azul Systems, and released to the public domain,
+ * as explained at http://creativecommons.org/publicdomain/zero/1.0/
+ *
+ * @author Fedor Burdun
  */
 package org.iohiccup;
 
@@ -12,10 +13,6 @@ import java.util.logging.Logger;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.HistogramLogWriter;
 
-/**
- *
- * @author fijiol
- */
 public class IOHiccupLogWriter extends Thread {
 
     private final IOHiccup ioHiccup;

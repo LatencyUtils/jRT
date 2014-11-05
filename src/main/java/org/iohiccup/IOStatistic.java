@@ -1,14 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Written by Fedor Burdun of Azul Systems, and released to the public domain,
+ * as explained at http://creativecommons.org/publicdomain/zero/1.0/
+ *
+ * @author Fedor Burdun
  */
 package org.iohiccup;
 
-/**
- *
- * @author fijiol
- */
 public class IOStatistic {
     public long processedSocket;
     public long startTime;

@@ -2,7 +2,9 @@
 /target
 *.jar
 /tmp
-
+*.hlog
+*.log
+*.hgrm
 /ioHiccupTest/build/
 /ioHiccupTest/nbproject/private/
 /ioHiccupTest/dist/

@@ -1,7 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Written by Fedor Burdun of Azul Systems, and released to the public domain,
+ * as explained at http://creativecommons.org/publicdomain/zero/1.0/
+ *
+ * @author Fedor Burdun
  */
 package iohiccuptest;
 
@@ -55,7 +56,8 @@ public class IoHiccupTest {
         return a.toString();
     }
 
-    static String[] sites = {"http://ya.ru", "http://vk.com", "http://www.yahoo.com", "http://tut.by", "http://twitter.com"};
+    //static String[] sites = {"http://ya.ru", "http://vk.com", "http://www.yahoo.com", "http://tut.by", "http://twitter.com"};
+    static String[] sites = {"http://www.yahoo.com"};
 
     static int workersQuantity = 0;
     /**

@@ -21,7 +21,7 @@ public class IOHiccupPremain {
             System.exit(1);
         }
 
-        IOHiccup.premain(agentArgument, instrumentation);
+        IOHiccup.premain0(agentArgument, instrumentation);
     }
     
     public static void main(String[] args) {

@@ -88,7 +88,7 @@ public class IOHiccup {
     
     public static ConcurrentHashMap<String, IOHiccup> ioHiccupWorkers = new ConcurrentHashMap<String, IOHiccup>();
     
-    public void premаin(String agentArgument, Instrumentation instrumentation) {
+    public void premain(String agentArgument, Instrumentation instrumentation) {
         
         configuration = new IOHiccupConfiguration();
         ioStat = new IOStatistic();
@@ -217,7 +217,7 @@ public class IOHiccup {
         ioHiccupLogWriter.start();    
     }
     
-    public static void premain(String agentArgument, Instrumentation instrumentation) {
+    public static void premain0(String agentArgument, Instrumentation instrumentation) {
         
         //Check here another instances and exit if then!
         if (initialized) {
@@ -229,7 +229,7 @@ public class IOHiccup {
         }
         
         IOHiccup ioHiccup = new IOHiccup();
-        ioHiccup.premаin(agentArgument, instrumentation);
+        ioHiccup.premain(agentArgument, instrumentation);
         
         initialized = true;
     }

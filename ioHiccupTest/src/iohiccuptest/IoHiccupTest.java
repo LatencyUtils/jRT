@@ -40,6 +40,7 @@ public class IoHiccupTest {
 
     private static final ArrayList<TestI> tests = new ArrayList<>();
     private static long finishTime;
+    private static long timeToWork;
 
     private static String getUrlSource(String url) throws IOException {
         URL yahoo = new URL(url);
@@ -72,7 +73,8 @@ public class IoHiccupTest {
                 tests.add(new TestI(Integer.valueOf(paramVals[1]), Long.valueOf(paramVals[2])));
             } else 
             if (paramVals.length == 2 && paramVals[0].equals("-t")) {
-                finishTime = System.currentTimeMillis() + Long.valueOf(paramVals[1]);
+                timeToWork = Long.valueOf(paramVals[1]);
+                finishTime = System.currentTimeMillis() + timeToWork;
             } else {
                 printHelp = true;
             }
@@ -94,7 +96,7 @@ public class IoHiccupTest {
         }
 
         try {
-            latch.await(100, TimeUnit.SECONDS);
+            latch.await(timeToWork + 1000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             Logger.getLogger(IoHiccupTest.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -130,6 +132,7 @@ public class IoHiccupTest {
                             
                             Thread.sleep(delay);
                         } catch (InterruptedException ex) {
+                            System.err.println("INTERRUPTED?!" + ex);
                             return;
                         } catch (IOException ex) {
                             System.err.println("(" + url + ") ER: " + ex);

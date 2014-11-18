@@ -185,7 +185,9 @@ public class IOHiccup {
         
         ioHiccupWorkers.put(configuration.uuid, this);
         
-        instrumentation.addTransformer(new IOHiccupTransformer(this));
+        instrument(agentArgument, instrumentation);
+        
+        retransformStreams(instrumentation);
                 
         //Some temporary place to print collected statistic.
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -216,8 +218,16 @@ public class IOHiccup {
         IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter(this);
         ioHiccupLogWriter.start();    
     }
+
+    public void retransformStreams(Instrumentation instrumentation) {
+    }
+
+    public void instrument(String agentArgument, Instrumentation instrumentation) {
+        IOHiccupTransformer ioHiccupTransformer = new IOHiccupTransformer(this);
+        ioHiccupTransformer.attachTo(instrumentation);
+    }
     
-    public static void premain0(String agentArgument, Instrumentation instrumentation) {
+    public static IOHiccup premain0(String agentArgument, Instrumentation instrumentation) {
         
         //Check here another instances and exit if then!
         if (initialized) {
@@ -232,6 +242,8 @@ public class IOHiccup {
         ioHiccup.premain(agentArgument, instrumentation);
         
         initialized = true;
+        
+        return ioHiccup;
     }
     
     private static final String[] remoteaddr = {"-raddr", "remote-addr"};

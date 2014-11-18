@@ -7,6 +7,7 @@
 package org.iohiccup;
 
 import java.lang.instrument.ClassFileTransformer;
+import java.lang.instrument.Instrumentation;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
@@ -16,16 +17,20 @@ import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
 public class IOHiccupTransformer implements ClassFileTransformer {
-    private final IOHiccupConfiguration configuration;
+    public IOHiccupConfiguration configuration;
 //    private final IOHiccup ioHiccup;
-    private final String iohiccup_field_name;
-    private final String checkString;
-    private final String iohic_field_name;
-    private final String debugPre;
-    private final String debugPost;
+    public String iohiccup_field_name;
+    public String checkString;
+    public String iohic_field_name;
+    public String debugPre;
+    public String debugPost;
+    public String accumulatorImplementationPackage = "org.iohiccup.";
+    public String accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
 
-    IOHiccupTransformer(IOHiccup ioHiccup) {
+    public IOHiccupTransformer(IOHiccup ioHiccup) {
 //        this.ioHiccup = ioHiccup;
+        this.accumulatorImplementationPackage = "org.iohiccup.";
+        this.accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
         this.configuration = ioHiccup.configuration;
         this.iohiccup_field_name = "ioHiccup_" + configuration.uuid.replaceAll("\\W", "_");
         this.iohic_field_name = "ioHic_" + configuration.uuid.replaceAll("\\W", "_");
@@ -39,6 +44,9 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         }
     }
     
+    public void attachTo(Instrumentation instrumentation) {
+        instrumentation.addTransformer(this);
+    }    
     
     @Override
     public byte[] transform(ClassLoader loader, String className,
@@ -52,7 +60,7 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         return doClass(className, clazz, bytes);
     }  
     
-    private byte[] doClass(String name, Class clazz, byte[] b) {
+    public byte[] doClass(String name, Class clazz, byte[] b) {
         ClassPool pool = ClassPool.getDefault();
 
         pool.appendClassPath(new LoaderClassPath(getClass().getClassLoader()));
@@ -67,11 +75,13 @@ public class IOHiccupTransformer implements ClassFileTransformer {
             cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
             if (cl.isInterface() == false) {
                 
-                CtField field = new CtField(iohicClass, iohic_field_name, cl);
-                cl.addField(field);
+                if (this.getClass().equals(IOHiccupTransformer.class)) {
+                    CtField field = new CtField(iohicClass, iohic_field_name, cl);
+                    cl.addField(field);
 
-                CtField hiccup_field = new CtField(iohiccupClass, iohiccup_field_name, cl);
-                cl.addField(hiccup_field);
+                    CtField hiccup_field = new CtField(iohiccupClass, iohiccup_field_name, cl);
+                    cl.addField(hiccup_field);
+                }
 
                 CtBehavior[] methods = cl.getDeclaredBehaviors();
                 for (int i = 0; i < methods.length; i++) {
@@ -82,7 +92,6 @@ public class IOHiccupTransformer implements ClassFileTransformer {
                             doIOMethods(name, methods[i]);
                         }
                         
-//                        if (false)
                         if (methods[i].getLongName().endsWith("SocketOutputStream(java.net.AbstractPlainSocketImpl)") ||
                                 methods[i].getLongName().endsWith("SocketInputStream(java.net.AbstractPlainSocketImpl)")) {
                             doIOStreamsConstructor(name, methods[i]);
@@ -104,10 +113,7 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         return b;
     }
 
-    static final String accumulatorImplementationPackage = "org.iohiccup.";
-    static final String accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
-
-    private void doIOMethods(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
+    public void doIOMethods(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("read")) {
             if (configuration.i2oEnabled) {
                 method.insertAfter(debugPre + checkString + accumulatorImplementationClass + ".putTimestampReadAfter("+ iohiccup_field_name +", "+ iohic_field_name + ");" + debugPost);
@@ -127,8 +133,9 @@ public class IOHiccupTransformer implements ClassFileTransformer {
         }
     }
     
-    private void doIOStreamsConstructor(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
+    public void doIOStreamsConstructor(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("SocketOutputStream") || method.getName().startsWith("SocketInputStream") ) {
+            
             method.insertAfter(
                     debugPre +
                     iohiccup_field_name + " = " + accumulatorImplementationClass + ".getIOHiccup(\"" + configuration.uuid + "\");" +
@@ -136,7 +143,9 @@ public class IOHiccupTransformer implements ClassFileTransformer {
                     iohic_field_name + "= " + accumulatorImplementationClass + 
                     ".initializeIOHic("+ iohiccup_field_name +", impl, impl.getInetAddress(), impl.getPort(), impl.getLocalPort());" +
                     debugPost);
+            
         }
+        
     }
     
 }

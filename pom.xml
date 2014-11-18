@@ -104,6 +104,9 @@
                             <Agent-Class>org.iohiccup.IOHiccupPremain</Agent-Class>
                             <Class-Path>target/lib</Class-Path>
                             <Class-Path>lib</Class-Path>
+                            <!-- -->
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                            <!-- -->
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -130,6 +133,9 @@
                                 <include>javassist:javassist</include>
                                 <include>org.hdrhistogram:*</include>
                                 <include>org.latencyutils:*</include>
+                                <!--
+                                <include>com.sun.tools:*</include>
+                                -->
                             </includes>
                             <rules>
                                 <rule>
@@ -144,6 +150,15 @@
                                     <pattern>org.LatencyUtils.**</pattern>
                                     <result>org.iohiccup.internal.latencyutils.@1</result>
                                 </rule>
+                                <!--
+                                <rule>
+                                    <pattern>com.sun.tools.**</pattern>
+                                    <result>org.iohiccup.internal.sun.attach.@1</result>
+
+                             <zipfileset>${java.home}/../lib/tools.jar</zipfileset>
+
+                                </rule>
+                                -->
                             </rules>
                         </configuration>
                     </execution>
@@ -255,6 +270,7 @@
             <artifactId>javassist</artifactId>
             <version>3.9.0.GA</version>
         </dependency>
+        
     </dependencies>
 
     <profiles>

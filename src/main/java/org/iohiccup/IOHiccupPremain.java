@@ -7,29 +7,10 @@
 package org.iohiccup;
 
 import com.sun.tools.attach.VirtualMachine;
-import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
-import java.security.ProtectionDomain;
-import java.util.ArrayList;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-   class MaTransformera implements ClassFileTransformer {
-
-        public MaTransformera() {
-        }
-
-        @Override
-        public byte[] transform(ClassLoader cl, String string, Class<?> type, ProtectionDomain pd, byte[] bytes) throws IllegalClassFormatException {
-            System.out.println("Hey, yah! " + type.getSimpleName());
-            return bytes;
-        }
-    }
-
-public class IOHiccupPremain implements ClassFileTransformer {
+public class IOHiccupPremain {
     
     
     public static void premain(String agentArgument, Instrumentation instrumentation) {
@@ -93,8 +74,6 @@ public class IOHiccupPremain implements ClassFileTransformer {
             System.exit(1);
         }
         
-        System.out.println("Parameters: '" + sb.toString() + "'");
-        
         try {
             
             VirtualMachine vm = VirtualMachine.attach(pid);
@@ -107,16 +86,6 @@ public class IOHiccupPremain implements ClassFileTransformer {
         
         } catch (Exception e) {
             e.printStackTrace();
-            if (e.getCause() != null) {
-                System.out.println("CAUSE::::");
-                e.getCause().printStackTrace();
-            }
         }
-    }
-
-    @Override
-    public byte[] transform(ClassLoader cl, String string, Class<?> type, ProtectionDomain pd, byte[] bytes) throws IllegalClassFormatException {
-            System.out.println("Hey, yah! " + type.getSimpleName());
-            return bytes;
     }
 }

@@ -23,10 +23,7 @@ public class IOHiccupTransformerAttachable extends IOHiccupTransformer {
         
         if (configuration.printExceptions) {
             
-            debugPre =  
-                    "System.out.println(\"HAS IO HIC == \" + " + " (null != "+ iohic_field_name + " && null != " + iohiccup_field_name + ") + ';' +  " + iohic_field_name + " + ';' + " + iohiccup_field_name + " + ';' + "
-                    + configuration.uuid + " + ';' + impl" + ");" + 
-                    " try { ";
+            debugPre =  " try { ";
             debugPost = " } catch (Exception e) { e.printStackTrace(); System.exit(1); } ";
         } else {
             debugPre = "";

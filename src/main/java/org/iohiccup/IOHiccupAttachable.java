@@ -18,7 +18,6 @@ public class IOHiccupAttachable extends IOHiccup {
             
     @Override
     public void retransformStreams(Instrumentation instrumentation) {
-        System.out.println("retransform!");
         try {
             Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
             ArrayList<Class> classesToTransform  = new ArrayList<Class>();
@@ -28,9 +27,6 @@ public class IOHiccupAttachable extends IOHiccup {
                     instrumentation.retransformClasses(c);
                 }
             }
-            for (Class c : classesToTransform) {
-                System.out.println("Klass: " + c.getSimpleName());
-            }
         } catch (UnmodifiableClassException ex) {
             ex.printStackTrace();
         }
@@ -38,7 +34,6 @@ public class IOHiccupAttachable extends IOHiccup {
     
     public void instrument(String agentArgument, Instrumentation instrumentation) {
         IOHiccupTransformerAttachable ioHiccupTransformer = new IOHiccupTransformerAttachable(this);
-        System.out.println("instryment by " + ioHiccupTransformer);
         ioHiccupTransformer.attachTo(instrumentation);
     }
         

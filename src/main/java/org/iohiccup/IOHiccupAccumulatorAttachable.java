@@ -7,13 +7,6 @@ package org.iohiccup;
 
 import java.net.InetAddress;
 import java.net.SocketImpl;
-import java.util.Collections;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import org.iohiccup.IOHic;
-import org.iohiccup.IOHiccup;
-import org.iohiccup.IOHiccupAccumulator;
-import org.iohiccup.IOHiccupConfiguration;
 
 
 public class IOHiccupAccumulatorAttachable extends IOHiccupAccumulator {

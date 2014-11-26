@@ -25,7 +25,7 @@ public class IOHiccup {
     public LatencyStats o2iLS;
     public boolean isAlive = true;
 
-    public IOHiccupConfiguration configuration;
+    public IOHiccupConfiguration configuration = new IOHiccupConfiguration();
     public IOStatistic ioStat;
     
     public Map<SocketImpl, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<SocketImpl, IOHic>());
@@ -40,7 +40,7 @@ public class IOHiccup {
         StringBuilder sb = new StringBuilder();
         for (String s : keys) {
             if (sb.length() > 0) {
-                sb.append(", ");
+                sb.append(" | ");
             }
             sb.append(s);
         }
@@ -50,6 +50,16 @@ public class IOHiccup {
     public static void printHelpAndExit() {
         System.out.println("Usage:");
         System.out.println("\tjava -jar ioHiccup.jar[=<args>]  -jar yourapp.jar\n");
+        printHelpParameters();
+                
+        System.out.println("\n");
+        System.out.println("Please rerun application with proper CLI options.\n");
+        
+        finishByError = true;
+        System.exit(1);
+    }
+
+    public static void printHelpParameters() {
         System.out.println("\t\twhere <args> is an comma separated list of arguments like arg1,arg2=val2 e.t.c\n");
         System.out.println("\t\tARGUMENTS:");
         System.out.println("\t\t  " + printKeys(help) + " \t\t to print help");
@@ -64,12 +74,6 @@ public class IOHiccup {
         System.out.println("\t\t  " + printKeys(uuid) + " \t\t to specify ioHiccup inner ID (take <string>)");
         System.out.println("\t\t  " + printKeys(i2oenabling) + " \t\t to calculate latency (take <boolean>)");
         System.out.println("\t\t  " + printKeys(o2ienabling) + " \t\t to calculate latency (take <boolean>)");
-                
-        System.out.println("\n");
-        System.out.println("Please rerun application with proper CLI options.\n");
-        
-        finishByError = true;
-        System.exit(1);
     }
     
     private static String fixupRegex(String str) {
@@ -90,11 +94,49 @@ public class IOHiccup {
     
     public void premain(String agentArgument, Instrumentation instrumentation) {
         
-        configuration = new IOHiccupConfiguration();
         ioStat = new IOStatistic();
 
         startTime = System.currentTimeMillis();
 
+        parseArguments(agentArgument);
+        
+        ioHiccupWorkers.put(configuration.uuid, this);
+        
+        instrument(agentArgument, instrumentation);
+        
+        retransformStreams(instrumentation);
+                
+        //Some temporary place to print collected statistic.
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                synchronized (IOHiccup.title) {
+                    if (finishByError) {
+                        return;
+                    }
+                    System.out.println("");
+                    System.out.println("***************************************************************");
+                    System.out.println("ioHiccup configuration: ");
+                    System.out.println("ioHiccup uid " + configuration.uuid);
+                    System.out.println("---------------------------------------------------------------");
+                    System.out.println("ioHiccupStatistic: ");
+                    System.out.println(" " + ioStat.processedSocket + " sockets was processed");
+                    System.out.println("***************************************************************");
+                    System.out.flush();
+                }
+            }
+
+        });
+
+        i2oLS = new LatencyStats();
+        o2iLS = new LatencyStats();
+
+        IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter(this);
+        ioHiccupLogWriter.start();    
+    }
+
+    public void parseArguments(String agentArgument) throws NumberFormatException {
         if (null != agentArgument) {
             for (String v : agentArgument.split(",")) {
                 String[] vArr = v.split("=");
@@ -182,41 +224,6 @@ public class IOHiccup {
                 }
             }
         }
-        
-        ioHiccupWorkers.put(configuration.uuid, this);
-        
-        instrument(agentArgument, instrumentation);
-        
-        retransformStreams(instrumentation);
-                
-        //Some temporary place to print collected statistic.
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                synchronized (IOHiccup.title) {
-                    if (finishByError) {
-                        return;
-                    }
-                    System.out.println("");
-                    System.out.println("***************************************************************");
-                    System.out.println("ioHiccup configuration: ");
-                    System.out.println("ioHiccup uid " + configuration.uuid);
-                    System.out.println("---------------------------------------------------------------");
-                    System.out.println("ioHiccupStatistic: ");
-                    System.out.println(" " + ioStat.processedSocket + " sockets was processed");
-                    System.out.println("***************************************************************");
-                    System.out.flush();
-                }
-            }
-
-        });
-
-        i2oLS = new LatencyStats();
-        o2iLS = new LatencyStats();
-
-        IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter(this);
-        ioHiccupLogWriter.start();    
     }
 
     public void retransformStreams(Instrumentation instrumentation) {

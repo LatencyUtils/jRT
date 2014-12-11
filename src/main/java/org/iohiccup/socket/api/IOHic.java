@@ -4,7 +4,7 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.socket.api;
 
 public class IOHic {
     public long i2oLatency;

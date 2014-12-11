@@ -4,7 +4,7 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;

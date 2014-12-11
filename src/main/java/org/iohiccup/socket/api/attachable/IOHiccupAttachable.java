@@ -4,15 +4,18 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.socket.api.attachable;
 
+import org.iohiccup.impl.IOHiccup;
+import org.iohiccup.socket.api.IOHic;
+import org.iohiccup.socket.api.attachable.TransformerAttachable;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.net.SocketImpl;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Attachable extends IOHiccup {
+public class IOHiccupAttachable extends IOHiccup {
 
     public static ConcurrentHashMap<SocketImpl, IOHic> attachableHics = new ConcurrentHashMap<SocketImpl, IOHic>();
             
@@ -48,7 +51,7 @@ public class Attachable extends IOHiccup {
             //System.exit(1);
         }
         
-        IOHiccup ioHiccup = new Attachable();
+        IOHiccup ioHiccup = new IOHiccupAttachable();
         ioHiccup.premain(agentArgument, instrumentation);
         
         initialized = true;

@@ -6,53 +6,14 @@
  */
 package org.iohiccup;
 
+import org.iohiccup.impl.IOHiccup;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
-import java.io.File;
 import java.io.IOException;
-import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.jar.JarFile;
 
 public class Attachermain {
-    
-    
-    public static void premain(String agentArgument, Instrumentation instrumentation) {
-        commonmain(agentArgument, instrumentation);
-
-        try {
-            IOHiccup.premain0(agentArgument, instrumentation);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        //instrumentation.addTransformer(new IOHiccupTransformer(IOHiccup.premain0(agentArgument, instrumentation)));
-    }
-
-    private static void commonmain(String arguments, Instrumentation instrumentation) {
-        // Exclude CLI option Xbootclasspath
-        try {
-            instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(Agentmain.class.getProtectionDomain().
-                            getCodeSource().getLocation().getPath()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-    }
-    
-    public static void agentmain(String agentArgument, Instrumentation instrumentation) {
-        
-        commonmain(agentArgument, instrumentation);
-        
-        try {
-            Attachable.premain0(agentArgument, instrumentation);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
     
     public static void main(String[] args) {
         //TODO: Exclude CLI option Xbootclasspath/a=...../tools.jar
@@ -108,7 +69,6 @@ public class Attachermain {
             VirtualMachine vm = VirtualMachine.attach(pid);
             
             vm.loadAgent(Agentmain.class.getProtectionDomain().
-                    
                             getCodeSource().getLocation().getPath(), agentArguments);
             vm.detach();
             System.exit(0);

@@ -6,6 +6,8 @@
  */
 package org.iohiccup;
 
+import org.iohiccup.socket.api.attachable.IOHiccupAttachable;
+import org.iohiccup.impl.IOHiccup;
 import java.lang.instrument.Instrumentation;
 
 import java.util.jar.JarFile;
@@ -40,7 +42,7 @@ public class Agentmain {
         commonmain(agentArgument, instrumentation);
         
         try {
-            Attachable.premain0(agentArgument, instrumentation);
+            IOHiccupAttachable.premain0(agentArgument, instrumentation);
         } catch (Throwable t) {
             t.printStackTrace();
         }

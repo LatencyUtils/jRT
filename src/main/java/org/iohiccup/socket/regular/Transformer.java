@@ -4,8 +4,10 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.socket.regular;
 
+import org.iohiccup.impl.Configuration;
+import org.iohiccup.impl.IOHiccup;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import javassist.CannotCompileException;

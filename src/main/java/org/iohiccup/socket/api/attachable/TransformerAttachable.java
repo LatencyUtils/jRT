@@ -4,12 +4,14 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.socket.api.attachable;
 
 import java.lang.instrument.Instrumentation;
 import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.NotFoundException;
+import org.iohiccup.impl.IOHiccup;
+import org.iohiccup.socket.regular.Transformer;
 
 public class TransformerAttachable extends Transformer {
 

@@ -4,7 +4,7 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.impl;
 
 public class IOStatistic {
     public long processedSocket;

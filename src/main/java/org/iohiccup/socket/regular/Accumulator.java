@@ -1,15 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Written by Fedor Burdun of Azul Systems, and released to the public domain,
+ * as explained at http://creativecommons.org/publicdomain/zero/1.0/
+ *
+ * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.socket.regular;
 
+import org.iohiccup.impl.Configuration;
+import org.iohiccup.impl.IOHiccup;
+import org.iohiccup.socket.api.IOHic;
 import java.net.InetAddress;
 import java.net.SocketImpl;
 
+public class Accumulator {
 
-public class AccumulatorAttachable extends Accumulator {
     private static boolean match(String a, String filter) {
         //return a.matches(".*" + filter + ".*");
         if (null == filter) {
@@ -41,6 +45,10 @@ public class AccumulatorAttachable extends Accumulator {
         return true;
     }    
     
+    public static IOHiccup getIOHiccup(String uuid) {
+        return IOHiccup.ioHiccupWorkers.get(uuid);
+    }
+    
     public static IOHic initializeIOHic(IOHiccup ioHiccup, SocketImpl sock, InetAddress remoteAddress, int remotePort, int localPort) {
         //System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);;
         
@@ -64,16 +72,6 @@ public class AccumulatorAttachable extends Accumulator {
         ++ioHiccup.ioStat.processedSocket;
         
         return iohic;
-    }
-
-    
-    
-    public static Attachable getIOHiccup(String uuid) {
-        return (Attachable) Attachable.ioHiccupWorkers.get(uuid);
-    }
-    
-    public static boolean hasAIOHic(String key, SocketImpl sock) {
-        return null != getAIOHic(key, null);
     }
 
 
@@ -107,13 +105,6 @@ public class AccumulatorAttachable extends Accumulator {
         StringBuilder sb = new StringBuilder();
 
         return sb.toString();
-    }   
-    
-    public static IOHiccup getAIOHiccup(String key, SocketImpl sock) {
-        return getIOHiccup(key);
     }
     
-    public static IOHic getAIOHic(String key, SocketImpl sock) {
-        return getAIOHiccup(key, sock).sockHiccups.get(sock);
-    }
 }

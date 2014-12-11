@@ -4,14 +4,18 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.iohiccup.impl;
 
+import org.iohiccup.impl.IOStatistic;
+import org.iohiccup.impl.LogWriter;
+import org.iohiccup.socket.api.IOHic;
 import java.lang.instrument.Instrumentation;
 import java.net.SocketImpl;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.LatencyUtils.LatencyStats;
+import org.iohiccup.socket.regular.Transformer;
 
 public class IOHiccup {
 

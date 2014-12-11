@@ -47,6 +47,11 @@ public class IOHiccup {
         return sb.toString();
     }
     
+    private static String printKeys(String[] keys, int align) {
+        String st = printKeys(keys);
+        return st + String.format("%0" + Math.max(1, align - st.length()) + "d", 0).replace('0', ' ');
+    }
+    
     public static void printHelpAndExit() {
         System.out.println("Usage:");
         System.out.println("\tjava -jar ioHiccup.jar[=<args>]  -jar yourapp.jar\n");
@@ -62,18 +67,18 @@ public class IOHiccup {
     public static void printHelpParameters() {
         System.out.println("\t\twhere <args> is an comma separated list of arguments like arg1,arg2=val2 e.t.c\n");
         System.out.println("\t\tARGUMENTS:");
-        System.out.println("\t\t  " + printKeys(help) + " \t\t to print help");
-        System.out.println("\t\t  " + printKeys(remoteaddr) + " \t\t to add filter by remote address");
-        System.out.println("\t\t  " + printKeys(remoteport) + " \t\t to add filter by remote port");
-        System.out.println("\t\t  " + printKeys(localport) + " \t\t to add filter by local port");
-        System.out.println("\t\t  " + printKeys(filterentry) + " \t\t to add filter by entry: <Local port>::<Remote address>:<Remote port> any part can be empty");
-        System.out.println("\t\t  " + printKeys(loginterval) + " \t\t to set log sampling interval");
-        System.out.println("\t\t  " + printKeys(startdelaying) + " \t\t to specify time delay to start ioHiccup");
-        System.out.println("\t\t  " + printKeys(workingtime) + " \t\t to specify how long ioHiccup will work");
-        System.out.println("\t\t  " + printKeys(logprefix) + " \t\t to specify ioHiccup log prefix");
-        System.out.println("\t\t  " + printKeys(uuid) + " \t\t to specify ioHiccup inner ID (take <string>)");
-        System.out.println("\t\t  " + printKeys(i2oenabling) + " \t\t to calculate latency (take <boolean>)");
-        System.out.println("\t\t  " + printKeys(o2ienabling) + " \t\t to calculate latency (take <boolean>)");
+        System.out.println("\t\t  " + printKeys(help, 40) + " to print help");
+        System.out.println("\t\t  " + printKeys(remoteaddr, 40) + " to add filter by remote address");
+        System.out.println("\t\t  " + printKeys(remoteport, 40) + " to add filter by remote port");
+        System.out.println("\t\t  " + printKeys(localport, 40) + " to add filter by local port");
+        System.out.println("\t\t  " + printKeys(filterentry, 40) + " to add filter by entry: <Local port>::<Remote address>:<Remote port> any part can be empty");
+        System.out.println("\t\t  " + printKeys(loginterval, 40) + " to set log sampling interval");
+        System.out.println("\t\t  " + printKeys(startdelaying, 40) + " to specify time delay to start ioHiccup");
+        System.out.println("\t\t  " + printKeys(workingtime, 40) + " to specify how long ioHiccup will work");
+        System.out.println("\t\t  " + printKeys(logprefix, 40) + " to specify ioHiccup log prefix");
+        System.out.println("\t\t  " + printKeys(uuid, 40) + " to specify ioHiccup inner ID (take <string>)");
+        System.out.println("\t\t  " + printKeys(i2oenabling, 40) + " to calculate latency (take <boolean>)");
+        System.out.println("\t\t  " + printKeys(o2ienabling, 40) + " to calculate latency (take <boolean>)");
     }
     
     private static String fixupRegex(String str) {

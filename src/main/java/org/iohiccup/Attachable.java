@@ -12,7 +12,7 @@ import java.net.SocketImpl;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class IOHiccupAttachable extends IOHiccup {
+public class Attachable extends IOHiccup {
 
     public static ConcurrentHashMap<SocketImpl, IOHic> attachableHics = new ConcurrentHashMap<SocketImpl, IOHic>();
             
@@ -33,7 +33,7 @@ public class IOHiccupAttachable extends IOHiccup {
     }
     
     public void instrument(String agentArgument, Instrumentation instrumentation) {
-        IOHiccupTransformerAttachable ioHiccupTransformer = new IOHiccupTransformerAttachable(this);
+        TransformerAttachable ioHiccupTransformer = new TransformerAttachable(this);
         ioHiccupTransformer.attachTo(instrumentation);
     }
         
@@ -48,7 +48,7 @@ public class IOHiccupAttachable extends IOHiccup {
             //System.exit(1);
         }
         
-        IOHiccup ioHiccup = new IOHiccupAttachable();
+        IOHiccup ioHiccup = new Attachable();
         ioHiccup.premain(agentArgument, instrumentation);
         
         initialized = true;

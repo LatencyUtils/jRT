@@ -1,16 +1,15 @@
-/**
- * Written by Fedor Burdun of Azul Systems, and released to the public domain,
- * as explained at http://creativecommons.org/publicdomain/zero/1.0/
- *
- * @author Fedor Burdun
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.iohiccup;
 
 import java.net.InetAddress;
 import java.net.SocketImpl;
 
-public class IOHiccupAccumulator {
 
+public class AccumulatorAttachable extends Accumulator {
     private static boolean match(String a, String filter) {
         //return a.matches(".*" + filter + ".*");
         if (null == filter) {
@@ -21,7 +20,7 @@ public class IOHiccupAccumulator {
     
     private static boolean match(IOHiccup ioHiccup, InetAddress remoteAddress, int remotePort, int localPort) {
         
-        for (IOHiccupConfiguration.IOFilterEntry entry : ioHiccup.configuration.filterEntries) {
+        for (Configuration.IOFilterEntry entry : ioHiccup.configuration.filterEntries) {
             if (null != entry.remoteaddr  &&
                     !match(remoteAddress.getHostAddress(), entry.remoteaddr) &&
                     !match(remoteAddress.getHostName(), entry.remoteaddr)  ) {
@@ -41,10 +40,6 @@ public class IOHiccupAccumulator {
         
         return true;
     }    
-    
-    public static IOHiccup getIOHiccup(String uuid) {
-        return IOHiccup.ioHiccupWorkers.get(uuid);
-    }
     
     public static IOHic initializeIOHic(IOHiccup ioHiccup, SocketImpl sock, InetAddress remoteAddress, int remotePort, int localPort) {
         //System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);;
@@ -69,6 +64,16 @@ public class IOHiccupAccumulator {
         ++ioHiccup.ioStat.processedSocket;
         
         return iohic;
+    }
+
+    
+    
+    public static Attachable getIOHiccup(String uuid) {
+        return (Attachable) Attachable.ioHiccupWorkers.get(uuid);
+    }
+    
+    public static boolean hasAIOHic(String key, SocketImpl sock) {
+        return null != getAIOHic(key, null);
     }
 
 
@@ -102,6 +107,13 @@ public class IOHiccupAccumulator {
         StringBuilder sb = new StringBuilder();
 
         return sb.toString();
+    }   
+    
+    public static IOHiccup getAIOHiccup(String key, SocketImpl sock) {
+        return getIOHiccup(key);
     }
     
+    public static IOHic getAIOHic(String key, SocketImpl sock) {
+        return getAIOHiccup(key, sock).sockHiccups.get(sock);
+    }
 }

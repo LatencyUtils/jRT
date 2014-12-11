@@ -16,8 +16,8 @@ import javassist.CtField;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
-public class IOHiccupTransformer implements ClassFileTransformer {
-    public IOHiccupConfiguration configuration;
+public class Transformer implements ClassFileTransformer {
+    public Configuration configuration;
 //    private final IOHiccup ioHiccup;
     public String iohiccup_field_name;
     public String checkString;
@@ -27,7 +27,7 @@ public class IOHiccupTransformer implements ClassFileTransformer {
     public String accumulatorImplementationPackage = "org.iohiccup.";
     public String accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
 
-    public IOHiccupTransformer(IOHiccup ioHiccup) {
+    public Transformer(IOHiccup ioHiccup) {
 //        this.ioHiccup = ioHiccup;
         this.accumulatorImplementationPackage = "org.iohiccup.";
         this.accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
@@ -75,7 +75,7 @@ public class IOHiccupTransformer implements ClassFileTransformer {
             cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
             if (cl.isInterface() == false) {
                 
-                if (this.getClass().equals(IOHiccupTransformer.class)) {
+                if (this.getClass().equals(Transformer.class)) {
                     CtField field = new CtField(iohicClass, iohic_field_name, cl);
                     cl.addField(field);
 

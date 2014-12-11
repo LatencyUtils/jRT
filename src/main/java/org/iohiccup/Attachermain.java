@@ -18,7 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 
-public class IOHiccupAttachermain {
+public class Attachermain {
     
     
     public static void premain(String agentArgument, Instrumentation instrumentation) {
@@ -35,7 +35,7 @@ public class IOHiccupAttachermain {
     private static void commonmain(String arguments, Instrumentation instrumentation) {
         // Exclude CLI option Xbootclasspath
         try {
-            instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(IOHiccupAgentmain.class.getProtectionDomain().
+            instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(Agentmain.class.getProtectionDomain().
                             getCodeSource().getLocation().getPath()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class IOHiccupAttachermain {
         commonmain(agentArgument, instrumentation);
         
         try {
-            IOHiccupAttachable.premain0(agentArgument, instrumentation);
+            Attachable.premain0(agentArgument, instrumentation);
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -107,7 +107,7 @@ public class IOHiccupAttachermain {
             
             VirtualMachine vm = VirtualMachine.attach(pid);
             
-            vm.loadAgent(IOHiccupAgentmain.class.getProtectionDomain().
+            vm.loadAgent(Agentmain.class.getProtectionDomain().
                     
                             getCodeSource().getLocation().getPath(), agentArguments);
             vm.detach();

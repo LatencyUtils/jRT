@@ -11,9 +11,9 @@ import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.NotFoundException;
 
-public class IOHiccupTransformerAttachable extends IOHiccupTransformer {
+public class TransformerAttachable extends Transformer {
 
-    public IOHiccupTransformerAttachable(IOHiccup ioHiccup) {
+    public TransformerAttachable(IOHiccup ioHiccup) {
         super(ioHiccup);
         accumulatorImplementationPackage = "org.iohiccup.";
         accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulatorAttachable";

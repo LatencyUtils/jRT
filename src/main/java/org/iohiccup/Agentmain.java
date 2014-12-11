@@ -10,7 +10,7 @@ import java.lang.instrument.Instrumentation;
 
 import java.util.jar.JarFile;
 
-public class IOHiccupAgentmain {
+public class Agentmain {
     
     
     public static void premain(String agentArgument, Instrumentation instrumentation) {
@@ -27,7 +27,7 @@ public class IOHiccupAgentmain {
     private static void commonmain(String arguments, Instrumentation instrumentation) {
         // Exclude CLI option Xbootclasspath
         try {
-            instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(IOHiccupAgentmain.class.getProtectionDomain().
+            instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(Agentmain.class.getProtectionDomain().
                             getCodeSource().getLocation().getPath()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,7 +40,7 @@ public class IOHiccupAgentmain {
         commonmain(agentArgument, instrumentation);
         
         try {
-            IOHiccupAttachable.premain0(agentArgument, instrumentation);
+            Attachable.premain0(agentArgument, instrumentation);
         } catch (Throwable t) {
             t.printStackTrace();
         }

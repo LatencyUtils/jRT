@@ -13,11 +13,11 @@ import java.util.logging.Logger;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.HistogramLogWriter;
 
-public class IOHiccupLogWriter extends Thread {
+public class LogWriter extends Thread {
 
     private final IOHiccup ioHiccup;
     
-    public IOHiccupLogWriter(IOHiccup ioHiccup) {
+    public LogWriter(IOHiccup ioHiccup) {
         setDaemon(true);
         this.ioHiccup = ioHiccup;
     }

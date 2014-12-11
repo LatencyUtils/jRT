@@ -25,7 +25,7 @@ public class IOHiccup {
     public LatencyStats o2iLS;
     public boolean isAlive = true;
 
-    public IOHiccupConfiguration configuration = new IOHiccupConfiguration();
+    public Configuration configuration = new Configuration();
     public IOStatistic ioStat;
     
     public Map<SocketImpl, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<SocketImpl, IOHic>());
@@ -137,7 +137,7 @@ public class IOHiccup {
         i2oLS = new LatencyStats();
         o2iLS = new LatencyStats();
 
-        IOHiccupLogWriter ioHiccupLogWriter = new IOHiccupLogWriter(this);
+        LogWriter ioHiccupLogWriter = new LogWriter(this);
         ioHiccupLogWriter.start();    
     }
 
@@ -154,15 +154,15 @@ public class IOHiccup {
                 }
                 if (hasKey(remoteaddr, vArr[0])) {
                     configuration.filterEntries.add(
-                            new IOHiccupConfiguration.IOFilterEntry(null, vArr[1], null));
+                            new Configuration.IOFilterEntry(null, vArr[1], null));
                 }
                 if (hasKey(localport, vArr[0])) {
                     configuration.filterEntries.add(
-                            new IOHiccupConfiguration.IOFilterEntry(vArr[1], null, null));
+                            new Configuration.IOFilterEntry(vArr[1], null, null));
                 }
                 if (hasKey(remoteport, vArr[0])) {
                     configuration.filterEntries.add(
-                            new IOHiccupConfiguration.IOFilterEntry(null, null, vArr[1]));
+                            new Configuration.IOFilterEntry(null, null, vArr[1]));
                 }
                 if (hasKey(filterentry, vArr[0]) && vArr.length == 2) {
                     boolean isCorrect = true;
@@ -204,7 +204,7 @@ public class IOHiccup {
                     }
                     
                     configuration.filterEntries.add(
-                            new IOHiccupConfiguration.IOFilterEntry(localPort, remoteAddr, remotePort));
+                            new Configuration.IOFilterEntry(localPort, remoteAddr, remotePort));
                 }
                 if (hasKey(loginterval, vArr[0])) {
                     configuration.logWriterInterval = Long.valueOf(vArr[1]);
@@ -235,7 +235,7 @@ public class IOHiccup {
     }
 
     public void instrument(String agentArgument, Instrumentation instrumentation) {
-        IOHiccupTransformer ioHiccupTransformer = new IOHiccupTransformer(this);
+        Transformer ioHiccupTransformer = new Transformer(this);
         ioHiccupTransformer.attachTo(instrumentation);
     }
     

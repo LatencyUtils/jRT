@@ -8,7 +8,7 @@ package org.iohiccup;
 
 import java.util.ArrayList;
 
-public class IOHiccupConfiguration {
+public class Configuration {
     
     public String uuid = String.valueOf(++IOHiccup.hiccupInstances);
     

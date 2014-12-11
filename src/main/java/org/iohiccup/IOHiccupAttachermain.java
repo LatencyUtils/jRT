@@ -10,11 +10,15 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
+import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 
-public class IOHiccupPremain {
+public class IOHiccupAttachermain {
     
     
     public static void premain(String agentArgument, Instrumentation instrumentation) {
@@ -31,8 +35,7 @@ public class IOHiccupPremain {
     private static void commonmain(String arguments, Instrumentation instrumentation) {
         // Exclude CLI option Xbootclasspath
         try {
-            instrumentation.appendToBootstrapClassLoaderSearch(
-                    new JarFile(IOHiccupPremain.class.getProtectionDomain().
+            instrumentation.appendToBootstrapClassLoaderSearch(new JarFile(IOHiccupAgentmain.class.getProtectionDomain().
                             getCodeSource().getLocation().getPath()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,7 +55,14 @@ public class IOHiccupPremain {
     }
     
     public static void main(String[] args) {
-        //TODO: Exclude CLI option Xbootclasspath        
+        //TODO: Exclude CLI option Xbootclasspath/a=...../tools.jar
+//        try {
+//        Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
+//        method.setAccessible(true);
+//        method.invoke(ClassLoader.getSystemClassLoader(), new Object[]{new File("/usr/lib/jvm/java-1.7.0-openjdk-amd64/lib/tools.jar").toURI().toURL()});
+//        } catch (Exception e) {
+//        }
+        
         
         boolean needHelp = false;
         String pid = null;
@@ -97,7 +107,7 @@ public class IOHiccupPremain {
             
             VirtualMachine vm = VirtualMachine.attach(pid);
             
-            vm.loadAgent(IOHiccupPremain.class.getProtectionDomain().
+            vm.loadAgent(IOHiccupAgentmain.class.getProtectionDomain().
                     
                             getCodeSource().getLocation().getPath(), agentArguments);
             vm.detach();

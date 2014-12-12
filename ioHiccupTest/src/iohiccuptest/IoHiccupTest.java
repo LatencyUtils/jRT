@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -43,18 +46,39 @@ public class IoHiccupTest {
     private static long timeToWork;
 
     private static String getUrlSource(String url) throws IOException {
-        URL yahoo = new URL(url);
-        URLConnection yc = yahoo.openConnection();
-        StringBuilder a;
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                yc.getInputStream(), "UTF-8"))) {
-            String inputLine;
-            a = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                a.append(inputLine);
+        if (false) {
+            //Regular way
+            URL yahoo = new URL(url);
+            URLConnection yc = yahoo.openConnection();
+            StringBuilder a;
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                    yc.getInputStream(), "UTF-8"))) {
+                String inputLine;
+                a = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    a.append(inputLine);
+                }
             }
+            return a.toString();
+        } else { 
+            //NIO
+            URL website = new URL(url);
+            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+            StringBuffer sb = new StringBuffer();
+            
+              try {
+                ByteBuffer buf=ByteBuffer.allocate(1024);
+                while (rbc.read(buf) > 0) {
+                  buf.flip();
+                  sb.append(new String(buf.array()));
+                }
+            }
+
+           catch (  Exception e) {
+               System.err.println("Error: " + e);
+            }
+            return sb.toString();
         }
-        return a.toString();
     }
 
     //static String[] sites = {"http://ya.ru", "http://vk.com", "http://www.yahoo.com", "http://tut.by", "http://twitter.com"};
@@ -125,7 +149,9 @@ public class IoHiccupTest {
                     int i =0;
                     while (System.currentTimeMillis() < finishTime) {
                         try {
-                            final int length = getUrlSource(url).length();
+                            final String urlSource = getUrlSource(url);
+//                            System.out.println(urlSource);
+                            final int length = urlSource.length();
                             
                             System.out.println(" Thread " + tid + " of " + workersQuantity + ": [ iteration " + (i + 1) 
                                     + " ]: getting context of site... " + url + " has been got " + length + " bytes");

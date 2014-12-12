@@ -22,7 +22,8 @@ public class IOHiccupAttachable extends IOHiccup {
             Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
             ArrayList<Class> classesToTransform  = new ArrayList<Class>();
             for (Class c : allLoadedClasses) {
-                if (c.getSimpleName().equals("SocketInputStream") || c.getSimpleName().equals("SocketOutputStream")) {
+//                if (c.getSimpleName().equals("SocketInputStream") || c.getSimpleName().equals("SocketOutputStream")) {
+                if (c.getSimpleName().equals("SourceChannelImpl")) {
                     classesToTransform.add(c);
                     instrumentation.retransformClasses(c);
                 }

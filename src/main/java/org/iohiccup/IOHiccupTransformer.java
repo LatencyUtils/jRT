@@ -53,8 +53,12 @@ public class IOHiccupTransformer implements ClassFileTransformer {
             Class clazz, java.security.ProtectionDomain domain,
             byte[] bytes) {
 
-        if (!className.startsWith("java/net/SocketInputStream")
-                && !className.startsWith("java/net/SocketOutputStream")) {
+//        !className.startsWith("java/net/SocketInputStream")
+//                && !className.startsWith("java/net/SocketOutputStream")
+        
+//        System.out.println("Class: " + className);
+        
+        if (!className.endsWith("IOUtil")) {
             return bytes;
         }
         return doClass(className, clazz, bytes);
@@ -87,15 +91,19 @@ public class IOHiccupTransformer implements ClassFileTransformer {
                 for (int i = 0; i < methods.length; i++) {
                     if (methods[i].isEmpty() == false) {
 
-                        if (methods[i].getLongName().endsWith("read(byte[],int,int,int)")
-                                || methods[i].getLongName().endsWith("write(byte[],int,int)")) {
+                        System.out.println("method: " + methods[i].getLongName());
+                        System.out.println("method: " + methods[i].getName());
+                        
+//                        if(false)
+                        if (methods[i].getName().contains("read")
+                                || methods[i].getName().contains("write")) {
                             doIOMethods(name, methods[i]);
                         }
                         
-                        if (methods[i].getLongName().endsWith("SocketOutputStream(java.net.AbstractPlainSocketImpl)") ||
-                                methods[i].getLongName().endsWith("SocketInputStream(java.net.AbstractPlainSocketImpl)")) {
-                            doIOStreamsConstructor(name, methods[i]);
-                        }
+//                        if (methods[i].getLongName().endsWith("SocketOutputStream(java.net.AbstractPlainSocketImpl)") ||
+//                                methods[i].getLongName().endsWith("SocketInputStream(java.net.AbstractPlainSocketImpl)")) {
+//                            doIOStreamsConstructor(name, methods[i]);
+//                        }
                     }
                 }
                 b = cl.toBytecode();
@@ -116,24 +124,29 @@ public class IOHiccupTransformer implements ClassFileTransformer {
     public void doIOMethods(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
         if (method.getName().startsWith("read")) {
             if (configuration.i2oEnabled) {
-                method.insertAfter(debugPre + checkString + accumulatorImplementationClass + ".putTimestampReadAfter("+ iohiccup_field_name +", "+ iohic_field_name + ");" + debugPost);
+                method.insertAfter("System.out.println(\"i2o read after " + method.getLongName() + ": \" + System.nanoTime() );");
             }
+            if (false)
             if (configuration.o2iEnabled) {
-                method.insertAfter(debugPre + checkString + accumulatorImplementationClass + ".putTimestampReadBefore("+ iohiccup_field_name +", "+ iohic_field_name + ");" + debugPost);
+                method.insertAfter("System.out.println(\"o2i read after " + method.getLongName() + ": \" + System.nanoTime() );");
             }
         }
 
         if (method.getName().startsWith("write")) {
             if (configuration.i2oEnabled) {
-                method.insertBefore(debugPre + checkString + accumulatorImplementationClass + ".putTimestampWriteBefore("+ iohiccup_field_name +", "+ iohic_field_name + ");" + debugPost);
+                method.insertBefore("System.out.println(\"i2o write before " + method.getLongName() + ": \" + System.nanoTime() );");
             }
+            if (false)
             if (configuration.o2iEnabled) {
-                method.insertBefore(debugPre + checkString + accumulatorImplementationClass + ".putTimestampWriteAfter("+ iohiccup_field_name +", "+ iohic_field_name + ");" + debugPost);
+                method.insertBefore("System.out.println(\"o2i write before " + method.getLongName() + ": \" + System.nanoTime() );");
             }
         }
     }
     
     public void doIOStreamsConstructor(String className, CtBehavior method) throws NotFoundException, CannotCompileException {
+        if (true)
+                return ;
+        
         if (method.getName().startsWith("SocketOutputStream") || method.getName().startsWith("SocketInputStream") ) {
             
             method.insertAfter(

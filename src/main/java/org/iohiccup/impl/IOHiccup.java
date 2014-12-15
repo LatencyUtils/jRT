@@ -9,13 +9,11 @@ package org.iohiccup.impl;
 import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 import org.iohiccup.socket.api.IOHic;
 import java.lang.instrument.Instrumentation;
-import java.net.SocketImpl;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.LatencyUtils.LatencyStats;
 import org.iohiccup.socket.api.Transformer;
-import org.iohiccup.socket.mockup.CodeWriterMockup;
 
 public class IOHiccup {
 
@@ -32,7 +30,7 @@ public class IOHiccup {
     public Configuration configuration = new Configuration();
     public IOStatistic ioStat;
     
-    public Map<SocketImpl, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<SocketImpl, IOHic>());
+    public Map<Object, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<Object, IOHic>());
     
     public static void main(String[] args) {
         System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"

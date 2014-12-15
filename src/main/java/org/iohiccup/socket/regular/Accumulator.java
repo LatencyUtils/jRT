@@ -10,10 +10,12 @@ import org.iohiccup.impl.Configuration;
 import org.iohiccup.impl.IOHiccup;
 import org.iohiccup.socket.api.IOHic;
 import java.net.InetAddress;
-import java.net.SocketImpl;
 
 public class Accumulator {
 
+    private static String this_package = "org.iohiccup.socket.regular";
+    private static String this_class = this_package + ".Accumulator";
+    
     private static boolean match(String a, String filter) {
         //return a.matches(".*" + filter + ".*");
         if (null == filter) {
@@ -49,10 +51,19 @@ public class Accumulator {
         return IOHiccup.ioHiccupWorkers.get(uuid);
     }
     
-    public static IOHic initializeIOHic(IOHiccup ioHiccup, SocketImpl sock, InetAddress remoteAddress, int remotePort, int localPort) {
+    public static String _filter(String ioHiccup, String sock, String remoteInetAddress, String remotePort, String localPort) {
+        return this_class + "initializeIOHic(" + ioHiccup + ", " + sock + ", " + remoteInetAddress + ", " + remotePort + ", " + localPort + ");";
+    }
+    
+    public static IOHic initializeIOHic(IOHiccup ioHiccup, Object sock, InetAddress remoteAddress, int remotePort, int localPort) {
         //System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);;
         
         IOHic iohic = null;
+        
+        if (ioHiccup == null) {
+            System.err.println("ioHiccup non initialized!");
+            return null;
+        }
         
         if (ioHiccup.sockHiccups.containsKey(sock)) {
             return ioHiccup.sockHiccups.get(sock);
@@ -74,13 +85,48 @@ public class Accumulator {
         return iohic;
     }
 
+    
+    
+    
 
+    private static String _timestampStub(String methodName, String ioHiccup, String ioHic) {
+        return this_class + "." + methodName + "(" + "(org.iohiccup.impl.IOHiccup)" + ioHiccup + ", " +  "(org.iohiccup.socket.api.IOHic)" +  ioHic + ");";
+    }
+    
+    public static String _readAfter(String ioHiccup, String ioHic) {
+        return _timestampStub("putTimestampReadAfter", ioHiccup, ioHic);
+    }
+    
+    public static String _readBefore(String ioHiccup, String ioHic) {
+        return _timestampStub("putTimestampReadBefore", ioHiccup, ioHic);
+    }
+    
+    public static String _writeAfter(String ioHiccup, String ioHic) {
+        return _timestampStub("putTimestampWriteAfter", ioHiccup, ioHic);
+    }
+    
+    public static String _writeBefore(String ioHiccup, String ioHic) {
+        return _timestampStub("putTimestampWriteBefore", ioHiccup, ioHic);
+    }
+    
+    
+    
+    
     public static void putTimestampReadAfter(IOHiccup ioHiccup, IOHic hic) {
+        System.out.println("here: " + ioHiccup + ", " + hic);
+        if (null == ioHiccup || hic == null) {
+            return;
+        }
+        
         hic.i2oReadTime = System.nanoTime();
         hic.i2oLastRead = true;
     }
     
     public static void putTimestampWriteBefore(IOHiccup ioHiccup, IOHic hic) {
+        if (null == ioHiccup || hic == null) {
+            return;
+        }
+        
         hic.i2oWriteTime = System.nanoTime();
         if (hic.i2oLastRead && (hic.i2oLatency = hic.i2oWriteTime - hic.i2oReadTime) > 0) {
             ioHiccup.i2oLS.recordLatency(hic.i2oLatency);
@@ -89,22 +135,24 @@ public class Accumulator {
     }
     
     public static void putTimestampWriteAfter(IOHiccup ioHiccup, IOHic hic) {
+        if (null == ioHiccup || hic == null) {
+            return;
+        }
+        
         hic.o2iReadTime = System.nanoTime();
         hic.o2iLastWrite = true;
     }
     
     public static void putTimestampReadBefore(IOHiccup ioHiccup, IOHic hic) {
+        if (null == ioHiccup || hic == null) {
+            return;
+        }
+        
         hic.o2iWriteTime = System.nanoTime();
         if (hic.o2iLastWrite && (hic.o2iLatency = hic.o2iWriteTime - hic.o2iReadTime) > 0) {
             ioHiccup.o2iLS.recordLatency(hic.o2iLatency);
         }
         hic.o2iLastWrite = false;
-    }
-    
-    public static String dumpIOHiccups() {
-        StringBuilder sb = new StringBuilder();
-
-        return sb.toString();
     }
     
 }

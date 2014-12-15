@@ -18,7 +18,21 @@ import javassist.CtField;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
 
-public class Transformer implements ClassFileTransformer {
+/*
+TODO: split to CodeWriter and InstrumentationWalker (Transformer itself)
+
+list of transformer actions/properties:
+    - accumulator package/class parametrization
+    - parametrize caching name/mechanizm 
+        (by concurrent map, by adding new fields to java socket presentation)
+        NIO?
+    - socket filtering
+    - conditions (f.e. initialized hiccup metainformation for proper socket?)
+    - debugging helpers (asserts, and catching silent exceptions)
+
+    Transformer should be parametrized with CodeWriter
+*/
+public class TransformerBAK implements ClassFileTransformer {
     public Configuration configuration;
 //    private final IOHiccup ioHiccup;
     public String iohiccup_field_name;
@@ -29,7 +43,7 @@ public class Transformer implements ClassFileTransformer {
     public String accumulatorImplementationPackage = "org.iohiccup.";
     public String accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
 
-    public Transformer(IOHiccup ioHiccup) {
+    public TransformerBAK(IOHiccup ioHiccup) {
 //        this.ioHiccup = ioHiccup;
         this.accumulatorImplementationPackage = "org.iohiccup.";
         this.accumulatorImplementationClass = accumulatorImplementationPackage + "IOHiccupAccumulator";
@@ -77,7 +91,7 @@ public class Transformer implements ClassFileTransformer {
             cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
             if (cl.isInterface() == false) {
                 
-                if (this.getClass().equals(Transformer.class)) {
+                if (this.getClass().equals(TransformerBAK.class)) {
                     CtField field = new CtField(iohicClass, iohic_field_name, cl);
                     cl.addField(field);
 

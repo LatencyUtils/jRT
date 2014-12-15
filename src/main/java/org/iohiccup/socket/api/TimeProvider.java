@@ -6,6 +6,8 @@
  */
 package org.iohiccup.socket.api;
 
-public interface TimeProvider {
-    public long getCurrentTime();
+public class TimeProvider {
+    public static long getCurrentTime() {
+        return System.nanoTime();
+    }
 }

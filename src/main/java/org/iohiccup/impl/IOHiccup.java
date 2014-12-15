@@ -6,8 +6,7 @@
  */
 package org.iohiccup.impl;
 
-import org.iohiccup.impl.IOStatistic;
-import org.iohiccup.impl.LogWriter;
+import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 import org.iohiccup.socket.api.IOHic;
 import java.lang.instrument.Instrumentation;
 import java.net.SocketImpl;
@@ -15,7 +14,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.LatencyUtils.LatencyStats;
-import org.iohiccup.socket.regular.Transformer;
+import org.iohiccup.socket.api.Transformer;
+import org.iohiccup.socket.mockup.CodeWriterMockup;
 
 public class IOHiccup {
 
@@ -113,8 +113,6 @@ public class IOHiccup {
         
         instrument(agentArgument, instrumentation);
         
-        retransformStreams(instrumentation);
-                
         //Some temporary place to print collected statistic.
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -124,6 +122,7 @@ public class IOHiccup {
                     if (finishByError) {
                         return;
                     }
+                    //TODO move/improve
                     System.out.println("");
                     System.out.println("***************************************************************");
                     System.out.println("ioHiccup configuration: ");
@@ -235,12 +234,8 @@ public class IOHiccup {
         }
     }
 
-    public void retransformStreams(Instrumentation instrumentation) {
-    }
-
     public void instrument(String agentArgument, Instrumentation instrumentation) {
-        Transformer ioHiccupTransformer = new Transformer(this);
-        ioHiccupTransformer.attachTo(instrumentation);
+        instrumentation.addTransformer(new Transformer(this, new JavaNetSocketCodeWrapper()));
     }
     
     public static IOHiccup premain0(String agentArgument, Instrumentation instrumentation) {

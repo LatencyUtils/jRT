@@ -8,7 +8,7 @@ package org.iohiccup.socket.api.attachable;
 
 import org.iohiccup.impl.IOHiccup;
 import org.iohiccup.socket.api.IOHic;
-import org.iohiccup.socket.api.attachable.TransformerAttachable;
+//import org.iohiccup.socket.api.attachable.TransformerAttachable;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.net.SocketImpl;
@@ -19,6 +19,7 @@ public class IOHiccupAttachable extends IOHiccup {
 
     public static ConcurrentHashMap<SocketImpl, IOHic> attachableHics = new ConcurrentHashMap<SocketImpl, IOHic>();
             
+    /* 
     @Override
     public void retransformStreams(Instrumentation instrumentation) {
         try {
@@ -34,10 +35,13 @@ public class IOHiccupAttachable extends IOHiccup {
             ex.printStackTrace();
         }
     }
-    
+    */
+
     public void instrument(String agentArgument, Instrumentation instrumentation) {
+    /*
         TransformerAttachable ioHiccupTransformer = new TransformerAttachable(this);
         ioHiccupTransformer.attachTo(instrumentation);
+            */
     }
         
     public static IOHiccup premain0(String agentArgument, Instrumentation instrumentation) {
@@ -51,12 +55,12 @@ public class IOHiccupAttachable extends IOHiccup {
             //System.exit(1);
         }
         
-        IOHiccup ioHiccup = new IOHiccupAttachable();
-        ioHiccup.premain(agentArgument, instrumentation);
+//        IOHiccup ioHiccup = new IOHiccupAttachable();
+//        ioHiccup.premain(agentArgument, instrumentation);
         
         initialized = true;
         
-        return ioHiccup;
+        return null;
     }
     
     

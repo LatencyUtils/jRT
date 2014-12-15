@@ -11,10 +11,10 @@ import javassist.CannotCompileException;
 import javassist.CtBehavior;
 import javassist.NotFoundException;
 import org.iohiccup.impl.IOHiccup;
-import org.iohiccup.socket.regular.Transformer;
+import org.iohiccup.socket.api.Transformer;
 
+/*
 public class TransformerAttachable extends Transformer {
-
     public TransformerAttachable(IOHiccup ioHiccup) {
         super(ioHiccup);
         accumulatorImplementationPackage = "org.iohiccup.";
@@ -51,5 +51,5 @@ public class TransformerAttachable extends Transformer {
         }
     }
         
-    
 }
+*/    

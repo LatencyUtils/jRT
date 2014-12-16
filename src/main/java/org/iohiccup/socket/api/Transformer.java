@@ -13,6 +13,7 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.LoaderClassPath;
+import javassist.Modifier;
 
 /*
 TODO: split to CodeWriter and InstrumentationWalker (Transformer itself)
@@ -78,14 +79,16 @@ public class Transformer implements ClassFileTransformer {
                 CtBehavior[] methods = cl.getDeclaredBehaviors();
                 
                 for (CtBehavior method : methods) {
-                    if (method.isEmpty() == false) {
+                    if ( method.isEmpty() == false && !Modifier.isNative(method.getModifiers()) ) {
                         String pre = codeWriter.preCode(method.getLongName());
                         String post = codeWriter.postCode(method.getLongName());
+//                        if (method.getMethodInfo().)
                         if (pre != null && pre.length() > 0) {
-                            System.out.println("trace: " + pre);
+                            System.out.println("trace (pre): " + method.getLongName() + " :: " + pre);
                             method.insertBefore(pre);
                         }
                         if (post != null && post.length() > 0) {
+                            System.out.println("trace (post): " + method.getLongName() + " :: " + post);
                             method.insertAfter(post);
                         }
                     }

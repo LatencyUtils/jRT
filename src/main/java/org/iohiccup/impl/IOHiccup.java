@@ -14,6 +14,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.LatencyUtils.LatencyStats;
 import org.iohiccup.socket.api.Transformer;
+import org.iohiccup.socket.nio.NioSocketCodeWrapper;
 
 public class IOHiccup {
 
@@ -234,6 +235,7 @@ public class IOHiccup {
 
     public void instrument(String agentArgument, Instrumentation instrumentation) {
         instrumentation.addTransformer(new Transformer(this, new JavaNetSocketCodeWrapper()));
+        instrumentation.addTransformer(new Transformer(this, new NioSocketCodeWrapper()));
     }
     
     public static IOHiccup premain0(String agentArgument, Instrumentation instrumentation) {

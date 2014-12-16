@@ -52,7 +52,7 @@ public class Accumulator {
     }
     
     public static String _filter(String ioHiccup, String sock, String remoteInetAddress, String remotePort, String localPort) {
-        return this_class + "initializeIOHic(" + ioHiccup + ", " + sock + ", " + remoteInetAddress + ", " + remotePort + ", " + localPort + ");";
+        return this_class + ".initializeIOHic(" + ioHiccup + ", " + sock + ", " + remoteInetAddress + ", " + remotePort + ", " + localPort + ");";
     }
     
     public static IOHic initializeIOHic(IOHiccup ioHiccup, Object sock, InetAddress remoteAddress, int remotePort, int localPort) {
@@ -113,7 +113,6 @@ public class Accumulator {
     
     
     public static void putTimestampReadAfter(IOHiccup ioHiccup, IOHic hic) {
-        System.out.println("here: " + ioHiccup + ", " + hic);
         if (null == ioHiccup || hic == null) {
             return;
         }

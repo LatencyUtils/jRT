@@ -18,42 +18,42 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
     String time_provider_class = "org.iohiccup.socket.api.TimeProvider";
     String get_current_time = time_provider_class + ".getCurrentTime()";
     String io_hiccup_static = "org.iohiccup.impl.IOHiccup";
-    private IOHiccup ioHiccup = null;
+    public IOHiccup ioHiccup = null;
     
     
-    String _getCurrentTime() {
+    public String _getCurrentTime() {
         return get_current_time;
     }
     
-    String _str(String arg) {
+    public String _str(String arg) {
         return "\"" + arg + "\"";
     }
     
-    String _sout(String arg) {
+    public String _sout(String arg) {
         return "System.out.println(" + arg + ");";
     }
     
-    String _serr(String arg) {
+    public String _serr(String arg) {
         return "System.err.println(" + arg + ");";
     }
     
-    String _plus() {
+    public String _plus() {
         return "+";
     }
     
-    String _block(String arg) {
+    public String _block(String arg) {
         return "{" + arg + "}";
     }
     
-    String _if(String condition, String thenBlock, String elseBlock) {
+    public String _if(String condition, String thenBlock, String elseBlock) {
         return "if (" + condition + ") { " + thenBlock + " } else { " + elseBlock + " } ";
     }
     
-    String _if(String condition, String thenBlock) {
+    public String _if(String condition, String thenBlock) {
         return _if(condition, thenBlock, "");
     }
     
-    String _rethrowWithPrint(String arg) {
+    public String _rethrowWithPrint(String arg) {
         return 
                 "try {" + 
                     arg + 
@@ -65,7 +65,7 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
                 "} ";
     }
     
-    String _debugWraps(String arg) {
+    public String _debugWraps(String arg) {
         if (ioHiccup.configuration.printExceptions) {
             return _rethrowWithPrint(arg);
         } else { 
@@ -73,28 +73,19 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
         }
     }
     
-    String _uniqVar(String name) {
+    public String _uniqVar(String name) {
         return ioHiccup.configuration.uuid.replaceAll("", "_") + name;
     }
     
-    String _ioHiccup() {
-//        if (true) return "null";
-              
-        return io_hiccup_static + ".ioHiccupWorkers.get(" + _str(ioHiccup.configuration.uuid) + ")";
+    public String _ioHiccup() {
+        return "((org.iohiccup.impl.IOHiccup)" + io_hiccup_static + ".ioHiccupWorkers.get(" + _str(ioHiccup.configuration.uuid) + "))";
     }
     
-    String _ioHic() {
-//        if (true) return "null";
-        
-//        try {org.iohiccup.socket.regular.Accumulator.putTimestampWriteBefore(org.iohiccup.impl.IOHiccup.ioHiccupWorkers.get("1"), 
-//                org.iohiccup.impl.IOHiccup.ioHiccupWorkers.get("1").sockHiccups.get(impl));} 
-//        catch (Exception e) { System.err.println("some exception was thrown during _trace: " + e ); e.printStackTrace(); throw e; } 
-//        
-//        IOHiccup.ioHiccupWorkers.get(null).sockHiccups.get(null);
-        return "((org.iohiccup.impl.IOHiccup)" + _ioHiccup() + ") " + ".sockHiccups.get(impl)";
+    public String _ioHic() {
+        return _ioHiccup() + ".sockHiccups.get(impl)";
     }
     
-    String _saveIOHic(String ioHicValue) {
+    public String _saveIOHic(String ioHicValue) {
         return _block( ioHicValue );
     }
     
@@ -134,10 +125,12 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
             return null;
         }
         
-        if (methodName.equals("SocketOutputStream(java.net.AbstractPlainSocketImpl)")) {
+        if (methodName.equals("java.net.SocketInputStream(java.net.AbstractPlainSocketImpl)") || 
+            methodName.equals("java.net.SocketOutputStream(java.net.AbstractPlainSocketImpl)")) {
+            
             return _debugWraps(
                     _saveIOHic(
-                            Accumulator._filter(methodName, methodName, methodName, methodName, methodName)
+                            Accumulator._filter(_ioHiccup(), "impl", "impl.getInetAddress()", "impl.getPort()", "impl.getLocalPort()")
                     )
             );
         }

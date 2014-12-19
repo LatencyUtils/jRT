@@ -92,12 +92,10 @@ public class Transformer implements ClassFileTransformer {
                         String post = codeWriter.postCode(method.getLongName());
                         
                         if (pre != null && pre.length() > 0) {
-//                            System.out.println("trace (pre): " + method.getLongName() + " :: " + pre);
                             code = pre;
                             method.insertBefore(pre);
                         }
                         if (post != null && post.length() > 0) {
-//                            System.out.println("trace (post): " + method.getLongName() + " :: " + post);
                             code = post;
                             method.insertAfter(post);
                         }

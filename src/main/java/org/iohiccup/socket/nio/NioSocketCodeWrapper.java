@@ -23,8 +23,6 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
 
     @Override
     public boolean needInstrument(String className) {
-//        if (true) return false;
-        
         return className != null && 
                 (
                 className.equals("sun/nio/ch/IOUtil") || 
@@ -36,9 +34,15 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
     @Override
     public String postCode(String methodName) {
         
-        if (methodName.contains("sun.nio.ch.SocketChannelImpl(")) {
+        if (methodName.equals("sun.nio.ch.SocketChannelImpl(java.nio.channels.spi.SelectorProvider,java.io.FileDescriptor,java.net.InetSocketAddress)")) {
             return _block(
                     Accumulator._filter(_ioHiccup(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
+            );
+        }
+
+        if (methodName.equals("sun.nio.ch.SocketChannelImpl.connect(java.net.SocketAddress)")) {
+            return _block(
+                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)sa).getAddress()", "((java.net.InetSocketAddress)sa).getPort()", "0")
             );
         }
 

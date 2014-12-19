@@ -8,6 +8,7 @@ package org.iohiccup.socket.api;
 
 import org.iohiccup.impl.IOHiccup;
 import java.lang.instrument.ClassFileTransformer;
+import java.util.Arrays;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
@@ -60,6 +61,8 @@ public class Transformer implements ClassFileTransformer {
 
         CtClass cl = null;
 
+        String code = null;
+        
         try {
             
             cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
@@ -69,9 +72,13 @@ public class Transformer implements ClassFileTransformer {
                 for (String varDeclaration : codeWriter.classNewFields(className)) { 
                     String[] var = varDeclaration.split(" ");
                     if (var.length != 2) {
+                        code = null;
                         throw new Exception("Check your codeWriter implementation: var declaration array size != 2, ==" + var.length);
                     }
                     CtClass typeClass = pool.get(var[0]);
+                    
+                    code = "adding field " + Arrays.deepToString(var);
+                    
                     CtField field = new CtField(typeClass, var[1], cl);
                     cl.addField(field);
                 }
@@ -79,26 +86,31 @@ public class Transformer implements ClassFileTransformer {
                 CtBehavior[] methods = cl.getDeclaredBehaviors();
                 
                 for (CtBehavior method : methods) {
+
                     if ( method.isEmpty() == false && !Modifier.isNative(method.getModifiers()) ) {
                         String pre = codeWriter.preCode(method.getLongName());
                         String post = codeWriter.postCode(method.getLongName());
-//                        if (method.getMethodInfo().)
+                        
                         if (pre != null && pre.length() > 0) {
-                            System.out.println("trace (pre): " + method.getLongName() + " :: " + pre);
+//                            System.out.println("trace (pre): " + method.getLongName() + " :: " + pre);
+                            code = pre;
                             method.insertBefore(pre);
                         }
                         if (post != null && post.length() > 0) {
-                            System.out.println("trace (post): " + method.getLongName() + " :: " + post);
+//                            System.out.println("trace (post): " + method.getLongName() + " :: " + post);
+                            code = post;
                             method.insertAfter(post);
                         }
                     }
                 }
                 
+                code = null;
                 b = cl.toBytecode();
             }
         } catch (Exception e) {
             System.err.println("Could not instrument  " + className
-                    + ",  exception : " + e + ":" + e.getMessage());
+                    + ", code = " + code + "\n, exception : " + 
+                    e + ":" + e.getMessage());
             System.err.flush();
             
             e.printStackTrace();

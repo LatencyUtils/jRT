@@ -56,8 +56,6 @@ public class Accumulator {
     }
     
     public static IOHic initializeIOHic(IOHiccup ioHiccup, Object sock, InetAddress remoteAddress, int remotePort, int localPort) {
-        //System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);;
-        
         IOHic iohic = null;
         
         if (ioHiccup == null) {

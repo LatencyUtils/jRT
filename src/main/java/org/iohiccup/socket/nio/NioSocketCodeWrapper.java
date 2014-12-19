@@ -7,6 +7,7 @@
 package org.iohiccup.socket.nio;
 
 import org.iohiccup.impl.IOHiccup;
+import org.iohiccup.socket.regular.Accumulator;
 import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 
 /**
@@ -22,23 +23,68 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
 
     @Override
     public boolean needInstrument(String className) {
+//        if (true) return false;
+        
         return className != null && 
-                (className.equals("sun/nio/ch/IOUtil") || 
-                 className.equals("sun/nio/ch/net"));
+                (
+                className.equals("sun/nio/ch/IOUtil") || 
+                className.equals("sun/nio/ch/SocketChannelImpl") ||
+                false
+                );
     }
 
     @Override
     public String postCode(String methodName) {
-        System.out.println("method: " + methodName);
         
-        if (true) return _sout(_str(methodName) + " + java.util.Arrays.deepToString($args) ") + "(new Throwable()).printStackTrace();";
+        if (methodName.contains("sun.nio.ch.SocketChannelImpl(")) {
+            return _block(
+                    Accumulator._filter(_ioHiccup(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
+            );
+        }
+
+        if (methodName.contains("sun.nio.ch.IOUtil.read(java.io.FileDescriptor,")) {
+            return _debugWraps(
+                    Accumulator._readAfter(_ioHiccup(), _ioHic())
+            );
+        }
+
+        if (methodName.contains("sun.nio.ch.IOUtil.write(java.io.FileDescriptor,")) {
+            return _debugWraps(
+                    Accumulator._writeAfter(_ioHiccup(), _ioHic())
+            );
+        }
+        
         return null;
     }
 
     @Override
     public String preCode(String methodName) {
+       if (methodName == null) {
+            return null;
+        }
+                              
+        if (methodName.contains("sun.nio.ch.IOUtil.read(java.io.FileDescriptor,")) {
+            
+            return _debugWraps(
+                    Accumulator._readBefore(_ioHiccup(), _ioHic())
+            );
+        }
+
+        if (methodName.contains("sun.nio.ch.IOUtil.write(java.io.FileDescriptor,")) {
+            return _debugWraps(
+                    Accumulator._writeBefore(_ioHiccup(), _ioHic())
+            );
+        }
+
         return null;
     }
     
     
+    @Override
+    public String _ioHic() {
+        return _ioHiccup() + ".sockHiccups.get(fd)";
+    }
+    
+       
 }
+

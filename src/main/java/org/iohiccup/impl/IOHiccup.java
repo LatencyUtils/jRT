@@ -9,10 +9,16 @@ package org.iohiccup.impl;
 import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 import org.iohiccup.socket.api.IOHic;
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.LatencyUtils.LatencyStats;
+import org.iohiccup.socket.api.CodeWriter;
 import org.iohiccup.socket.api.Transformer;
 import org.iohiccup.socket.nio.NioSocketCodeWrapper;
 
@@ -101,7 +107,6 @@ public class IOHiccup {
     public static ConcurrentHashMap<String, IOHiccup> ioHiccupWorkers = new ConcurrentHashMap<String, IOHiccup>();
     
     public void premain(String agentArgument, Instrumentation instrumentation) {
-        
         ioStat = new IOStatistic();
 
         startTime = System.currentTimeMillis();
@@ -110,6 +115,9 @@ public class IOHiccup {
         
         ioHiccupWorkers.put(configuration.uuid, this);
         
+        i2oLS = new LatencyStats();
+        o2iLS = new LatencyStats();
+
         instrument(agentArgument, instrumentation);
         
         //Some temporary place to print collected statistic.
@@ -121,7 +129,7 @@ public class IOHiccup {
                     if (finishByError) {
                         return;
                     }
-                    //TODO move/improve
+                    //TODO move/remove/improve
                     System.out.println("");
                     System.out.println("***************************************************************");
                     System.out.println("ioHiccup configuration: ");
@@ -135,9 +143,6 @@ public class IOHiccup {
             }
 
         });
-
-        i2oLS = new LatencyStats();
-        o2iLS = new LatencyStats();
 
         LogWriter ioHiccupLogWriter = new LogWriter(this);
         ioHiccupLogWriter.start();    
@@ -234,8 +239,35 @@ public class IOHiccup {
     }
 
     public void instrument(String agentArgument, Instrumentation instrumentation) {
-        instrumentation.addTransformer(new Transformer(this, new JavaNetSocketCodeWrapper()));
-        instrumentation.addTransformer(new Transformer(this, new NioSocketCodeWrapper()));
+        instrumentation.addTransformer(new Transformer(this, new JavaNetSocketCodeWrapper()), true);
+        instrumentation.addTransformer(new Transformer(this, new NioSocketCodeWrapper()), true);
+        
+    /*
+    untested code to support attaching to existing java process
+    */
+        redeclare(instrumentation, new JavaNetSocketCodeWrapper());
+        redeclare(instrumentation, new NioSocketCodeWrapper());
+    }
+    
+    /*
+    untested code to support attaching to existing java process
+    */
+    private void redeclare(Instrumentation instrumentation, CodeWriter cw) {
+        ArrayList<Class> ac = new ArrayList<Class>();
+        
+        for (Class c : instrumentation.getAllLoadedClasses()) {
+            final String className = c.getName().replace(".", "/");
+            
+            if (cw.needInstrument(className)) {
+                ac.add(c);
+                try {
+                    instrumentation.retransformClasses(c);
+                } catch (UnmodifiableClassException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        
     }
     
     public static IOHiccup premain0(String agentArgument, Instrumentation instrumentation) {

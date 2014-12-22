@@ -11,12 +11,9 @@ import org.iohiccup.socket.api.IOHic;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.LatencyUtils.LatencyStats;
 import org.iohiccup.socket.api.CodeWriter;
 import org.iohiccup.socket.api.Transformer;
@@ -88,20 +85,6 @@ public class IOHiccup {
         System.out.println("\t\t  " + printKeys(uuid, 40) + " to specify ioHiccup inner ID (take <string>)");
         System.out.println("\t\t  " + printKeys(i2oenabling, 40) + " to calculate latency (take <boolean>)");
         System.out.println("\t\t  " + printKeys(o2ienabling, 40) + " to calculate latency (take <boolean>)");
-    }
-    
-    private static String fixupRegex(String str) {
-        if (true) {
-            return str;
-        }       
-        try {
-        "".matches(str);
-        } catch (Exception e) {
-            System.err.println("WARN: regex '" + str + "' is not understandable");
-            System.exit(1); //??
-            return null;
-        }
-        return str;
     }
     
     public static ConcurrentHashMap<String, IOHiccup> ioHiccupWorkers = new ConcurrentHashMap<String, IOHiccup>();

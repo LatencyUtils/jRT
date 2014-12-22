@@ -40,9 +40,7 @@ public class LogWriter extends Thread {
             o2ilog.outputStartTime(ioHiccup.startTime);
             
             while ((System.currentTimeMillis() - ioHiccup.startTime < ioHiccup.configuration.startDelaying)) {
-                ioHiccup.i2oLS.forceIntervalSample();
                 Histogram intervalHistogram = ioHiccup.i2oLS.getIntervalHistogram();
-                ioHiccup.o2iLS.forceIntervalSample();
                 Histogram intervalHistogram2 = ioHiccup.o2iLS.getIntervalHistogram();
                 
                 Thread.sleep(ioHiccup.configuration.logWriterInterval);
@@ -50,13 +48,11 @@ public class LogWriter extends Thread {
             
             while ((System.currentTimeMillis() - ioHiccup.startTime < ioHiccup.configuration.workingTime) && ioHiccup.isAlive && !Thread.interrupted()) {
                 
-                ioHiccup.i2oLS.forceIntervalSample();
                 Histogram intervalHistogram = ioHiccup.i2oLS.getIntervalHistogram();
                 intervalHistogram.setStartTimeStamp(intervalHistogram.getStartTimeStamp() - ioHiccup.startTime);
                 intervalHistogram.setEndTimeStamp(intervalHistogram.getEndTimeStamp() - ioHiccup.startTime);
                 i2olog.outputIntervalHistogram(intervalHistogram);
                 
-                ioHiccup.o2iLS.forceIntervalSample();
                 Histogram intervalHistogram2 = ioHiccup.o2iLS.getIntervalHistogram();
                 intervalHistogram2.setStartTimeStamp(intervalHistogram2.getStartTimeStamp() - ioHiccup.startTime);
                 intervalHistogram2.setEndTimeStamp(intervalHistogram2.getEndTimeStamp() - ioHiccup.startTime);

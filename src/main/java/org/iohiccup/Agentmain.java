@@ -6,7 +6,6 @@
  */
 package org.iohiccup;
 
-import org.iohiccup.socket.api.attachable.IOHiccupAttachable;
 import org.iohiccup.impl.IOHiccup;
 import java.lang.instrument.Instrumentation;
 

@@ -117,6 +117,7 @@ public class IOHiccup {
                     System.out.println("***************************************************************");
                     System.out.println("ioHiccup configuration: ");
                     System.out.println("ioHiccup uid " + configuration.uuid);
+                    System.out.println("log files " + configuration.logPrefix + ".*");
                     System.out.println("---------------------------------------------------------------");
                     System.out.println("ioHiccupStatistic: ");
                     System.out.println(" " + ioStat.processedSocket + " sockets was processed");

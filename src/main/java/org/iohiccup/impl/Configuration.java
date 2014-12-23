@@ -6,7 +6,10 @@
  */
 package org.iohiccup.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 public class Configuration {
     
@@ -15,7 +18,8 @@ public class Configuration {
     public boolean i2oEnabled   = true;
     public boolean o2iEnabled   = true;
     public long logWriterInterval = 1000;
-    public String logPrefix = "hiccup." + System.currentTimeMillis() + "." + uuid;
+    public String logPrefix = "iohiccups." +  (new SimpleDateFormat("MMddyy-hhmm")).format(new Date()) + "." + 
+            UUID.randomUUID() + "." + uuid;
     public boolean printExceptions = true;
 
     public static class IOFilterEntry {

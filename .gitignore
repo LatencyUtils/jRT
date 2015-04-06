@@ -5,6 +5,7 @@
 *.hlog
 *.log
 *.hgrm
+*.class
 /ioHiccupTest/build/
 /ioHiccupTest/nbproject/private/
 /ioHiccupTest/dist/

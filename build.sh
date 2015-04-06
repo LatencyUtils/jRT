@@ -1,6 +1,6 @@
 #!/bin/sh -x
 
-mvn assembly:assembly
+rm -rf target
 mvn assembly:assembly
 cp target/ioHiccup.jar ./
 

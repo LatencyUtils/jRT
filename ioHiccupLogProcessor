@@ -5,7 +5,7 @@
 # Written by Gil Tene, and released to the public domain, as explained at
 #  http://creativecommons.org/publicdomain/zero/1.0/
 #
-JHICCUP_Version=2.0.1
+IOHICCUP_Version=2.0.1
 #
 # ioHiccupLogProcessor will process an inpit log and can generate two
 # different log files from a single ioHiccup histogram log file: a
@@ -49,9 +49,9 @@ INSTALLED_PATH=$(readlink_f $0)
 # Check if running from unpacked distribution archive by assuming ioHiccup.jar
 # in the same directory as this script. If not, try to search in target/ directory
 # (running from the source repository build).
-JHICCUP_JAR_FILE=$INSTALLED_PATH/ioHiccup.jar
-if [ ! -f $JHICCUP_JAR_FILE ] ; then
-  JHICCUP_JAR_FILE=$INSTALLED_PATH/target/ioHiccup.jar
+IOHICCUP_JAR_FILE=$INSTALLED_PATH/ioHiccup.jar
+if [ ! -f $IOHICCUP_JAR_FILE ] ; then
+  IOHICCUP_JAR_FILE=$INSTALLED_PATH/target/ioHiccup.jar
 fi
 
 JAVA_BIN=`which java`
@@ -75,12 +75,12 @@ fi
 
 # Deal with Windows/cygwin path normalization syntax needs:
 # Key Assumption: only cygwin/Windows installations will have a cygpath command...
-cygpath -w $JHICCUP_JAR_FILE &> /dev/null
+cygpath -w $IOHICCUP_JAR_FILE &> /dev/null
 if [ $? -eq 0 ] ; then
     # if using cygwin, use valid windows-style classpath
-    JHICCUP_JAR_FILE=`cygpath -w $JHICCUP_JAR_FILE`
-	echo Windows path for hiccup jar file is $JHICCUP_JAR_FILE
+    IOHICCUP_JAR_FILE=`cygpath -w $IOHICCUP_JAR_FILE`
+	echo Windows path for hiccup jar file is $IOHICCUP_JAR_FILE
 fi
 
-exec $JAVA_CMD -cp $JHICCUP_JAR_FILE org.iohiccup.internal.hdrhistogram.HistogramLogProcessor $@
+exec $JAVA_CMD -cp $IOHICCUP_JAR_FILE org.iohiccup.internal.hdrhistogram.HistogramLogProcessor $@
 #exec $CMD

@@ -15,8 +15,14 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src</directory>
-            <outputDirectory>/src</outputDirectory>
+            <directory>${project.basedir}/</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>convert_all.sh</include>
+                <include>README</include>
+                <include>ioHiccupLogProcessor</include>
+                <include>ioHiccupPlotter.xls</include>
+            </includes>
         </fileSet>
     </fileSets>
 </assembly>

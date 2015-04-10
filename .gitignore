@@ -6,6 +6,7 @@
 *.log
 *.hgrm
 *.class
+Version.java
 /ioHiccupTest/build/
 /ioHiccupTest/nbproject/private/
 /ioHiccupTest/dist/

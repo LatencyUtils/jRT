@@ -62,6 +62,7 @@ public class Transformer implements ClassFileTransformer {
         CtClass cl = null;
 
         String code = null;
+        String methodDescription = null;
         
         try {
             
@@ -93,22 +94,26 @@ public class Transformer implements ClassFileTransformer {
                         
                         if (pre != null && pre.length() > 0) {
                             code = pre;
+                            methodDescription = "insert before method " + method.getLongName();
                             method.insertBefore(pre);
                         }
                         if (post != null && post.length() > 0) {
                             code = post;
+                            methodDescription = "insert before method " + method.getLongName();
                             method.insertAfter(post);
                         }
                     }
                 }
                 
                 code = null;
+                methodDescription = null;
                 b = cl.toBytecode();
             }
         } catch (Exception e) {
-            System.err.println("Could not instrument  " + className
-                    + ", code = " + code + "\n, exception : " + 
-                    e + ":" + e.getMessage());
+            System.err.println("Could not instrument class=" + className
+                    + " (" + methodDescription + ")"
+                    + "\n, code = " + code + "\n, exception : " + 
+                    e.getMessage() + "\n:" + e);
             System.err.flush();
             
             e.printStackTrace();

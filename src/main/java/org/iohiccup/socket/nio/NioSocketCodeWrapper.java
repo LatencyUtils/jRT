@@ -36,12 +36,14 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
         
         if (methodName.equals("sun.nio.ch.SocketChannelImpl(java.nio.channels.spi.SelectorProvider,java.io.FileDescriptor,java.net.InetSocketAddress)")) {
             return _block(
+                    //ENSURE that fd everywhere can be get!
                     Accumulator._filter(_ioHiccup(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
             );
         }
 
         if (methodName.equals("sun.nio.ch.SocketChannelImpl.connect(java.net.SocketAddress)")) {
             return _block(
+                    //ENSURE that fd everywhere can be get!
                     Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)sa).getAddress()", "((java.net.InetSocketAddress)sa).getPort()", "0")
             );
         }
@@ -86,7 +88,9 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
     
     @Override
     public String _ioHic() {
-        return _ioHiccup() + ".sockHiccups.get(fd)";
+        // return _ioHiccup() + ".sockHiccups.get(fd)"; // <-- Expected fd ~ $1
+        // Code below is correct, because we used it only while redefine read/write functions that get FileDescriptor as first argument
+        return _ioHiccup() + ".sockHiccups.get($1)";
     }
     
        

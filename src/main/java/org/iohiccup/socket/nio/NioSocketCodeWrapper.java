@@ -44,7 +44,7 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
         if (methodName.equals("sun.nio.ch.SocketChannelImpl.connect(java.net.SocketAddress)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
-                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)sa).getAddress()", "((java.net.InetSocketAddress)sa).getPort()", "0")
+                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
             );
         }
 

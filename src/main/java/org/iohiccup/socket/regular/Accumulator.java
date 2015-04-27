@@ -16,7 +16,7 @@ public class Accumulator {
     private static String this_package = "org.iohiccup.socket.regular";
     private static String this_class = this_package + ".Accumulator";
     
-    private static boolean match(String a, String filter) {
+    private static boolean matchPort(String a, String filter) {
         //return a.matches(".*" + filter + ".*");
         if (null == filter) {
             return false;
@@ -24,27 +24,46 @@ public class Accumulator {
         return a.equals(filter);
     }
     
+    private static boolean matchAddr(String a, String filter) {
+        if (null == filter) {
+            return false;
+        }
+        return a.matches(".*" + filter + ".*");
+    }
+    
     private static boolean match(IOHiccup ioHiccup, InetAddress remoteAddress, int remotePort, int localPort) {
         
-        for (Configuration.IOFilterEntry entry : ioHiccup.configuration.filterEntries) {
-            if (null != entry.remoteaddr  &&
-                    !match(remoteAddress.getHostAddress(), entry.remoteaddr) &&
-                    !match(remoteAddress.getHostName(), entry.remoteaddr)  ) {
-                return false;
-            }
-            if (null != entry.remoteport && 
-                    !match(String.valueOf(remotePort), entry.remoteport)) {
-                return false;
-            }
-            if (null != entry.localport && 
-                    !match(String.valueOf(localPort), entry.localport)) {
-                return false;
+        boolean matched = false;
+        
+        if (ioHiccup.configuration.filterEntries.isEmpty()) {
+            matched = true;
+        } else {
+            for (Configuration.IOFilterEntry entry : ioHiccup.configuration.filterEntries) {
+                boolean matched_locally = true;
+
+                if (null != entry.remoteaddr  &&
+                        !matchAddr(remoteAddress.getHostAddress(), entry.remoteaddr) &&
+                        !matchAddr(remoteAddress.getHostName(), entry.remoteaddr)  ) {
+                    matched_locally = false;
+                }
+                if (null != entry.remoteport && 
+                        !matchPort(String.valueOf(remotePort), entry.remoteport)) {
+                    matched_locally = false;
+                }
+                if (null != entry.localport && 
+                        !matchPort(String.valueOf(localPort), entry.localport)) {
+                    matched_locally = false;
+                }
+                if (matched_locally) {
+                    matched = true;
+                    break;
+                }
             }
         }
         
-        //System.out.println("Calculate hiccups between " + remoteAddress + ":" + remotePort + " <-> " + "127.0.0.1:" + localPort); //Print on debug level?
+        //System.out.println("Calculate hiccups between " + remoteAddress + ":" + remotePort + " <-> " + "127.0.0.1:" + localPort + " === " + matched); //Print on debug level?
         
-        return true;
+        return matched;
     }    
     
     public static IOHiccup getIOHiccup(String uuid) {
@@ -56,6 +75,8 @@ public class Accumulator {
     }
     
     public static IOHic initializeIOHic(IOHiccup ioHiccup, Object sock, InetAddress remoteAddress, int remotePort, int localPort) {
+        //System.out.println("initializeIOHic " + sock + "," + remoteAddress + "," + remotePort + "," + localPort);
+        
         IOHic iohic = null;
         
         if (ioHiccup == null) {

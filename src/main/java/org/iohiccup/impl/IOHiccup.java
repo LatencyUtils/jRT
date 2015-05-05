@@ -77,7 +77,7 @@ public class IOHiccup {
         System.out.println("\t\t  " + printKeys(remoteaddr, 40) + " to add filter by remote address");
         System.out.println("\t\t  " + printKeys(remoteport, 40) + " to add filter by remote port");
         System.out.println("\t\t  " + printKeys(localport, 40) + " to add filter by local port");
-        System.out.println("\t\t  " + printKeys(filterentry, 40) + " to add filter by entry: <Local port>::<Remote address>:<Remote port> any part can be empty");
+        System.out.println("\t\t  " + printKeys(filterentry, 40) + " to add filter by entry: <Local port>:<Remote address>:<Remote port> any part can be empty");
         System.out.println("\t\t  " + printKeys(loginterval, 40) + " to set log sampling interval");
         System.out.println("\t\t  " + printKeys(startdelaying, 40) + " to specify time delay to start ioHiccup");
         System.out.println("\t\t  " + printKeys(workingtime, 40) + " to specify how long ioHiccup will work");
@@ -162,28 +162,21 @@ public class IOHiccup {
                     String remoteAddr = null;
                     String remotePort = null;
                     
-                    String[] ports = vArr[1].split("::");
+                    String[] ports = vArr[1].split(":");
                     
-                    if (ports.length == 2) {
-                        if (ports[0].length() > 0) {
-                            localPort = ports[0];
-                        }
-                        String[] remote = ports[1].split(":");
-                        
-                        if (remote.length >= 1) {
-                            if (remote[0].length() > 0) {
-                                remoteAddr = remote[0];
-                            } 
-                        }
-                        if (remote.length >= 2) {
-                            if (remote[1].length() > 0) {
-                                remotePort = remote[1];
-                            }
-                        } 
-                        if (remote.length > 2){
-                            isCorrect = false;
-                        }
-                    } else {
+                    if (ports.length > 0 && ports[0].length() > 0) {
+                        localPort = ports[0];
+                    }
+
+                    if (ports.length > 1 && ports[1].length() > 0) {
+                        remoteAddr = ports[1];
+                    }
+
+                    if (ports.length > 2 && ports[2].length() > 0) {
+                        remotePort = ports[2];
+                    }
+
+                    if (ports.length < 2 || ports.length > 3) {
                         isCorrect = false;
                     }
 

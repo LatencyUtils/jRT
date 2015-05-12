@@ -213,13 +213,13 @@ public class IOHiccup {
                     configuration.o2iEnabled = Boolean.valueOf(vArr[1]);
                 }
                 if (hasKey(ioMode, vArr[0])) {
-                    if (vArr[1] == "i2o") {
+                    if ("i2o".equals(vArr[1])) {
                         configuration.i2oEnabled = true;
                         configuration.o2iEnabled = false;
-                    } else if (vArr[1] == "o2i") {
+                    } else if ("o2i".equals(vArr[1])) {
                         configuration.i2oEnabled = false;
                         configuration.o2iEnabled = true;
-                    } else if (vArr[1] == "both") {
+                    } else if ("both".equals(vArr[1])) {
                         configuration.i2oEnabled = true;
                         configuration.o2iEnabled = true;
                     } else {

@@ -83,8 +83,9 @@ public class IOHiccup {
         System.out.println("\t\t  " + printKeys(workingtime, 40) + " to specify how long ioHiccup will work");
         System.out.println("\t\t  " + printKeys(logprefix, 40) + " to specify ioHiccup log prefix");
         System.out.println("\t\t  " + printKeys(uuid, 40) + " to specify ioHiccup inner ID (take <string>)");
-        System.out.println("\t\t  " + printKeys(i2oenabling, 40) + " to calculate latency (take <boolean>)");
-        System.out.println("\t\t  " + printKeys(o2ienabling, 40) + " to calculate latency (take <boolean>)");
+        System.out.println("\t\t  " + printKeys(ioMode, 40) + " to specify ioHiccup mode. Expects one of i2o, o2i, both. Both by default");
+//        System.out.println("\t\t  " + printKeys(i2oenabling, 40) + " to calculate latency (take <boolean>)");
+//        System.out.println("\t\t  " + printKeys(o2ienabling, 40) + " to calculate latency (take <boolean>)");
     }
     
     public static ConcurrentHashMap<String, IOHiccup> ioHiccupWorkers = new ConcurrentHashMap<String, IOHiccup>();
@@ -211,6 +212,22 @@ public class IOHiccup {
                 if (hasKey(o2ienabling, vArr[0])) {
                     configuration.o2iEnabled = Boolean.valueOf(vArr[1]);
                 }
+                if (hasKey(ioMode, vArr[0])) {
+                    if (vArr[1] == "i2o") {
+                        configuration.i2oEnabled = true;
+                        configuration.o2iEnabled = false;
+                    } else if (vArr[1] == "o2i") {
+                        configuration.i2oEnabled = false;
+                        configuration.o2iEnabled = true;
+                    } else if (vArr[1] == "both") {
+                        configuration.i2oEnabled = true;
+                        configuration.o2iEnabled = true;
+                    } else {
+                        System.err.println("Parameter " + vArr[0] + 
+                                " expects one of i2o, o2i, both argument. But " + vArr[1] + " has been got.");
+                        printHelpAndExit();
+                    }
+                }
             }
         }
     }
@@ -276,6 +293,7 @@ public class IOHiccup {
     private static final String[] workingtime = {"-fin", "finish-after"};
     private static final String[] logprefix = {"-lp", "log-prefix"};
     private static final String[] uuid = {"-id", "uuid"};
+    private static final String[] ioMode = {"-mode"};
     private static final String[] i2oenabling = {"-i2o"};
     private static final String[] o2ienabling = {"-o2i"};
 

@@ -134,6 +134,7 @@
                         <configuration>
                             <includes>
                                 <include>javassist:javassist</include>
+                                <include>org.javassist:javassist</include>
                                 <include>org.hdrhistogram:*</include>
                                 <include>org.latencyutils:*</include>
                                 <!--
@@ -143,6 +144,10 @@
                             <rules>
                                 <rule>
                                     <pattern>javassist.**</pattern>
+                                    <result>org.iohiccup.internal.javassist.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.javassist.**</pattern>
                                     <result>org.iohiccup.internal.javassist.@1</result>
                                 </rule>
                                 <rule>
@@ -267,12 +272,19 @@
             <version>2.0.2</version>
             <type>jar</type>
         </dependency>
-
+        
         <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.9.0.GA</version>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.19.0-GA</version>
         </dependency>
+        
+<!--        <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.12.1.GA</version>
+        </dependency>-->
+
         
     </dependencies>
 

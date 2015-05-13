@@ -48,6 +48,7 @@ public class Transformer implements ClassFileTransformer {
             Class clazz, java.security.ProtectionDomain domain,
             byte[] bytes) {
 
+        
         if (!codeWriter.needInstrument(className)) {
             return bytes;
         }
@@ -55,74 +56,82 @@ public class Transformer implements ClassFileTransformer {
     }  
     
     public byte[] doClass(String className, Class clazz, byte[] b) {
-        ClassPool pool = ClassPool.getDefault();
-
-        pool.appendClassPath(new LoaderClassPath(getClass().getClassLoader()));
-
-        CtClass cl = null;
-
-        String code = null;
-        String methodDescription = null;
-        
         try {
-            
-            cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
-            
-            if (cl.isInterface() == false) {
-                
-                for (String varDeclaration : codeWriter.classNewFields(className)) { 
-                    String[] var = varDeclaration.split(" ");
-                    if (var.length != 2) {
-                        code = null;
-                        throw new Exception("Check your codeWriter implementation: var declaration array size != 2, ==" + var.length);
-                    }
-                    CtClass typeClass = pool.get(var[0]);
-                    
-                    code = "adding field " + Arrays.deepToString(var);
-                    
-                    CtField field = new CtField(typeClass, var[1], cl);
-                    cl.addField(field);
-                }
-                
-                CtBehavior[] methods = cl.getDeclaredBehaviors();
-                
-                for (CtBehavior method : methods) {
+            ClassPool pool = ClassPool.getDefault();
 
-                    if ( method.isEmpty() == false && !Modifier.isNative(method.getModifiers()) ) {
-                        String pre = codeWriter.preCode(method.getLongName());
-                        String post = codeWriter.postCode(method.getLongName());
-                        
-                        if (pre != null && pre.length() > 0) {
-                            code = pre;
-                            methodDescription = "insert before method " + method.getLongName();
-                            method.insertBefore(pre);
+            CtClass cl = null;
+
+            String code = null;
+            String methodDescription = null;
+
+            try {
+
+                cl = pool.makeClass(new java.io.ByteArrayInputStream(b));
+
+                if (cl.isInterface() == false) {
+
+                    for (String varDeclaration : codeWriter.classNewFields(className)) { 
+                        String[] var = varDeclaration.split(" ");
+                        if (var.length != 2) {
+                            code = null;
+                            throw new Exception("Check your codeWriter implementation: var declaration array size != 2, ==" + var.length);
                         }
-                        if (post != null && post.length() > 0) {
-                            code = post;
-                            methodDescription = "insert before method " + method.getLongName();
-                            method.insertAfter(post);
+                        CtClass typeClass = pool.get(var[0]);
+
+                        code = "adding field " + Arrays.deepToString(var);
+
+                        CtField field = new CtField(typeClass, var[1], cl);
+                        cl.addField(field);
+                    }
+
+                    CtBehavior[] methods = cl.getDeclaredBehaviors();
+
+                    for (CtBehavior method : methods) {
+                        System.err.println("there3: " + codeWriter.getClass().getName());
+
+                        if ( method.isEmpty() == false && !Modifier.isNative(method.getModifiers()) ) {
+                            String pre = codeWriter.preCode(method.getLongName());
+                            String post = codeWriter.postCode(method.getLongName());
+
+                            if (pre != null && pre.length() > 0) {
+                                code = pre;
+                                methodDescription = "insert before method " + method.getLongName();
+                                method.insertBefore(pre);
+                            }
+                            if (post != null && post.length() > 0) {
+                                code = post;
+                                methodDescription = "insert before method " + method.getLongName();
+                                method.insertAfter(post);
+                            }
                         }
                     }
+
+                    code = null;
+                    methodDescription = null;
+                    b = cl.toBytecode();
                 }
-                
-                code = null;
-                methodDescription = null;
-                b = cl.toBytecode();
+            } catch (Exception e) {
+                System.err.println("Could not instrument class=" + className
+                        + " (" + methodDescription + ")"
+                        + "\n, code = " + code + "\n, exception : " + 
+                        e.getMessage() + "\n:" + e);
+                System.err.flush();
+
+                e.printStackTrace();
+            } finally {
+                if (cl != null) {
+                    cl.detach();
+                }
             }
-        } catch (Exception e) {
-            System.err.println("Could not instrument class=" + className
-                    + " (" + methodDescription + ")"
-                    + "\n, code = " + code + "\n, exception : " + 
-                    e.getMessage() + "\n:" + e);
-            System.err.flush();
-            
-            e.printStackTrace();
-        } finally {
-            if (cl != null) {
-                cl.detach();
-            }
+            return b;
+        } catch (RuntimeException e) {
+            System.err.println("Transformation failed with : " + e);
+            throw e;
+        } catch (Throwable t) {
+            System.err.println("Transformation failed with : " + t);
+            System.exit(1);
+            return null;
         }
-        return b;
     }
 
 }

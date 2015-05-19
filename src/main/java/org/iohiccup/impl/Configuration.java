@@ -6,6 +6,7 @@
  */
 package org.iohiccup.impl;
 
+import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +20,9 @@ public class Configuration {
     public boolean o2iEnabled   = true;
     public long logWriterInterval = 1000;
     public String logPrefix = "iohiccups." +  (new SimpleDateFormat("MMddyy-hhmm")).format(new Date()) + "." + 
-            UUID.randomUUID() + "." + uuid;
+            ManagementFactory.getRuntimeMXBean().getName().replace("@", "-") + 
+//                UUID.randomUUID() + 
+                "." + uuid;
     public boolean printExceptions = true;
 
     public static class IOFilterEntry {

@@ -27,6 +27,7 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
                 (
                 className.equals("sun/nio/ch/IOUtil") || 
                 className.equals("sun/nio/ch/SocketChannelImpl") ||
+                className.equals("sun/nio/ch/AsynchronousSocketChannelImpl") ||
                 false
                 );
     }
@@ -42,6 +43,27 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
         }
 
         if (methodName.equals("sun.nio.ch.SocketChannelImpl.connect(java.net.SocketAddress)")) {
+            return _block(
+                    //ENSURE that fd everywhere can be get!
+                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
+            );
+        }
+
+        if (methodName.equals("sun.nio.ch.AsynchronousSocketChannelImpl(sun.nio.ch.AsynchronousChannelGroupImpl,java.io.FileDescriptor,java.net.InetSocketAddress)")) {
+            return _block(
+                    //ENSURE that fd everywhere can be get!
+                    Accumulator._filter(_ioHiccup(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
+            );
+        }
+
+        if (methodName.equals("sun.nio.ch.AsynchronousSocketChannelImpl.connect(java.net.SocketAddress)")) {
+            return _block(
+                    //ENSURE that fd everywhere can be get!
+                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
+            );
+        }
+
+        if (methodName.equals("sun.nio.ch.AsynchronousSocketChannelImpl.connect(java.net.SocketAddress,java.lang.Object,java.nio.channels.CompletionHandler)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
                     Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")

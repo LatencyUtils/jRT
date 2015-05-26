@@ -13,24 +13,12 @@ import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
-import javassist.LoaderClassPath;
 import javassist.Modifier;
 
-/*
-TODO: split to CodeWriter and InstrumentationWalker (Transformer itself)
-
-list of transformer actions/properties:
-    - accumulator package/class parametrization
-    - parametrize caching name/mechanizm 
-        (by concurrent map, by adding new fields to java socket presentation)
-        NIO?
-    - socket filtering
-    - conditions (f.e. initialized hiccup metainformation for proper socket?)
-    - debugging helpers (asserts, and catching silent exceptions)
-
-    Transformer should be parametrized with CodeWriter
-*/
 public class Transformer implements ClassFileTransformer {
+    private static boolean traceClasses = false;
+    private static boolean traceMethods = false;
+            
     private final IOHiccup iOHiccup;
     
     private final CodeWriter codeWriter;
@@ -48,10 +36,18 @@ public class Transformer implements ClassFileTransformer {
             Class clazz, java.security.ProtectionDomain domain,
             byte[] bytes) {
 
+        if (traceClasses) {
+            System.out.println(">> " + className);
+        }
         
         if (!codeWriter.needInstrument(className)) {
             return bytes;
         }
+        
+        if (traceClasses) {
+            System.out.println(">> " + className + " will be instrumented!");
+        }
+        
         return doClass(className, clazz, bytes);
     }  
     
@@ -71,6 +67,10 @@ public class Transformer implements ClassFileTransformer {
                 if (cl.isInterface() == false) {
 
                     for (String varDeclaration : codeWriter.classNewFields(className)) { 
+                        if (traceClasses) {
+                            System.out.println(">> " + className + " will have new field " + varDeclaration);
+                        }
+                        
                         String[] var = varDeclaration.split(" ");
                         if (var.length != 2) {
                             code = null;
@@ -87,8 +87,10 @@ public class Transformer implements ClassFileTransformer {
                     CtBehavior[] methods = cl.getDeclaredBehaviors();
 
                     for (CtBehavior method : methods) {
-                        System.err.println("there3: " + codeWriter.getClass().getName());
-
+                        if (traceMethods) {
+                            System.out.println(">>> " + className + " go over method " + method.getLongName());
+                        }
+                        
                         if ( method.isEmpty() == false && !Modifier.isNative(method.getModifiers()) ) {
                             String pre = codeWriter.preCode(method.getLongName());
                             String post = codeWriter.postCode(method.getLongName());
@@ -102,6 +104,9 @@ public class Transformer implements ClassFileTransformer {
                                 code = post;
                                 methodDescription = "insert before method " + method.getLongName();
                                 method.insertAfter(post);
+                            }
+                            if (traceMethods && (pre != null && pre.length() > 0 || post != null && post.length() > 0)) {
+                                System.out.println(">>> " + className + " method " + method.getLongName() + " will be instrumented.");
                             }
                         }
                     }

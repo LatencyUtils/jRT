@@ -6,7 +6,6 @@
  */
 package org.iohiccup.impl;
 
-import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 import org.iohiccup.socket.api.IOHic;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
@@ -18,6 +17,7 @@ import org.LatencyUtils.LatencyStats;
 import org.iohiccup.socket.api.CodeWriter;
 import org.iohiccup.socket.api.Transformer;
 import org.iohiccup.socket.nio.NioSocketCodeWrapper;
+import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 
 public class IOHiccup {
 
@@ -201,7 +201,7 @@ public class IOHiccup {
                     configuration.workingTime = Long.valueOf(vArr[1]);
                 }
                 if (hasKey(logprefix, vArr[0])) {
-                    configuration.logPrefix = (vArr[1]);
+                    configuration.setLogNamePattern(vArr[1]);
                 }
                 if (hasKey(uuid, vArr[0])) {
                     configuration.uuid = (vArr[1]);

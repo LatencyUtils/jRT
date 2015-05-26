@@ -19,6 +19,7 @@ public class Configuration {
     public boolean i2oEnabled   = true;
     public boolean o2iEnabled   = true;
     public long logWriterInterval = 1000;
+    //equal to ioHiccup.jar=-lp=iohiccups.%d.%p-%h.%i
     public String logPrefix = "iohiccups." +  (new SimpleDateFormat("MMddyy-hhmm")).format(new Date()) + "." + 
             ManagementFactory.getRuntimeMXBean().getName().replace("@", "-") + 
 //                UUID.randomUUID() + 
@@ -42,4 +43,13 @@ public class Configuration {
     
     public long startDelaying = 0;             //miliseconds
     public long workingTime = Long.MAX_VALUE;  //infinity
+    
+    public void setLogNamePattern(String str) {
+        logPrefix = str
+                .replaceAll("%r", UUID.randomUUID().toString())
+                .replaceAll("%p", ManagementFactory.getRuntimeMXBean().getName().replaceAll("@\\w+", ""))
+                .replaceAll("%h", ManagementFactory.getRuntimeMXBean().getName().replaceAll("\\w+@", ""))
+                .replaceAll("%i", uuid)
+                .replaceAll("%d", (new SimpleDateFormat("MMddyy-hhmm")).format(new Date()));
+    }
 }

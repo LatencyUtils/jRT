@@ -147,7 +147,7 @@ public class Accumulator {
         
         hic.i2oWriteTime = System.nanoTime();
         if (hic.i2oLastRead && (hic.i2oLatency = hic.i2oWriteTime - hic.i2oReadTime) > 0) {
-            jRT.i2oLS.recordLatency(hic.i2oLatency);
+            if (null != jRT.i2oLS) jRT.i2oLS.recordLatency(hic.i2oLatency);
         }
         hic.i2oLastRead = false;
     }
@@ -168,7 +168,7 @@ public class Accumulator {
         
         hic.o2iWriteTime = System.nanoTime();
         if (hic.o2iLastWrite && (hic.o2iLatency = hic.o2iWriteTime - hic.o2iReadTime) > 0) {
-            jRT.o2iLS.recordLatency(hic.o2iLatency);
+            if (null != jRT.o2iLS) jRT.o2iLS.recordLatency(hic.o2iLatency);
         }
         hic.o2iLastWrite = false;
     }

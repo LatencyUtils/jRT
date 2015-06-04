@@ -99,8 +99,8 @@ public class JRT {
         
         jRTWorkers.put(configuration.uuid, this);
         
-        i2oLS = new LatencyStats();
-        o2iLS = new LatencyStats();
+        if (configuration.i2oEnabled) i2oLS = new LatencyStats();
+        if (configuration.o2iEnabled) o2iLS = new LatencyStats();
 
         instrument(agentArgument, instrumentation);
         

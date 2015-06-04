@@ -27,37 +27,43 @@ public class LogWriter extends Thread {
         HistogramLogWriter i2olog = null;
         HistogramLogWriter o2ilog = null;
         try {
-            i2olog = new HistogramLogWriter(new File(jRT.configuration.logPrefix + ".i2o.hlog"));
-            o2ilog = new HistogramLogWriter(new File(jRT.configuration.logPrefix + ".o2i.hlog"));
+            if (null != jRT.i2oLS) i2olog = new HistogramLogWriter(new File(jRT.configuration.logPrefix + ".i2o.hlog"));
+            if (null != jRT.o2iLS) o2ilog = new HistogramLogWriter(new File(jRT.configuration.logPrefix + ".o2i.hlog"));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(JRT.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
         try {
-            i2olog.outputLegend();
-            o2ilog.outputLegend();
-            i2olog.outputStartTime(jRT.startTime);
-            o2ilog.outputStartTime(jRT.startTime);
+            if (null != jRT.i2oLS) {
+                i2olog.outputLegend();
+                i2olog.outputStartTime(jRT.startTime);
+            }
+            if (null != jRT.o2iLS) {
+                o2ilog.outputLegend();
+                o2ilog.outputStartTime(jRT.startTime);
+            }
             
             while ((System.currentTimeMillis() - jRT.startTime < jRT.configuration.startDelaying)) {
-                Histogram intervalHistogram = jRT.i2oLS.getIntervalHistogram();
-                Histogram intervalHistogram2 = jRT.o2iLS.getIntervalHistogram();
+                if (null != jRT.i2oLS) { Histogram intervalHistogram = jRT.i2oLS.getIntervalHistogram(); }
+                if (null != jRT.o2iLS) { Histogram intervalHistogram2 = jRT.o2iLS.getIntervalHistogram(); }
                 
                 Thread.sleep(jRT.configuration.logWriterInterval);
             }
             
             while ((System.currentTimeMillis() - jRT.startTime < jRT.configuration.workingTime) && jRT.isAlive && !Thread.interrupted()) {
+                if (null != jRT.i2oLS) {
+                    Histogram intervalHistogram = jRT.i2oLS.getIntervalHistogram();
+                    intervalHistogram.setStartTimeStamp(intervalHistogram.getStartTimeStamp() - jRT.startTime);
+                    intervalHistogram.setEndTimeStamp(intervalHistogram.getEndTimeStamp() - jRT.startTime);
+                    i2olog.outputIntervalHistogram(intervalHistogram);
+                }
                 
-                Histogram intervalHistogram = jRT.i2oLS.getIntervalHistogram();
-                intervalHistogram.setStartTimeStamp(intervalHistogram.getStartTimeStamp() - jRT.startTime);
-                intervalHistogram.setEndTimeStamp(intervalHistogram.getEndTimeStamp() - jRT.startTime);
-                i2olog.outputIntervalHistogram(intervalHistogram);
-                
-                Histogram intervalHistogram2 = jRT.o2iLS.getIntervalHistogram();
-                intervalHistogram2.setStartTimeStamp(intervalHistogram2.getStartTimeStamp() - jRT.startTime);
-                intervalHistogram2.setEndTimeStamp(intervalHistogram2.getEndTimeStamp() - jRT.startTime);
-                o2ilog.outputIntervalHistogram(intervalHistogram2);
-                
+                if (null != jRT.o2iLS) {
+                    Histogram intervalHistogram2 = jRT.o2iLS.getIntervalHistogram();
+                    intervalHistogram2.setStartTimeStamp(intervalHistogram2.getStartTimeStamp() - jRT.startTime);
+                    intervalHistogram2.setEndTimeStamp(intervalHistogram2.getEndTimeStamp() - jRT.startTime);
+                    o2ilog.outputIntervalHistogram(intervalHistogram2);
+                }
                 
                 Thread.sleep(jRT.configuration.logWriterInterval);
                 
@@ -67,8 +73,8 @@ public class LogWriter extends Thread {
         } finally {
             //Nothing to do?
             //Need to flush logs?
-            jRT.i2oLS.stop();
-            jRT.o2iLS.stop();
+            if (null != jRT.i2oLS) jRT.i2oLS.stop();
+            if (null != jRT.o2iLS) jRT.o2iLS.stop();
         }
     }
     

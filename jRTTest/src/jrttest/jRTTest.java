@@ -4,7 +4,7 @@
  *
  * @author Fedor Burdun
  */
-package iohiccuptest;
+package jrttest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +36,7 @@ class TestI {
 
 }
 
-public class IoHiccupTest {
+public class jRTTest {
 
     private static final ArrayList<TestI> tests = new ArrayList<>();
     private static long finishTime;
@@ -80,7 +80,7 @@ public class IoHiccupTest {
             }
         }
         if (printHelp) {
-            System.out.println("Usage ioHiccupTest -t:<ms> -i:<count>:<delays> -i... -i...");
+            System.out.println("Usage jRTTest -t:<ms> -i:<count>:<delays> -i... -i...");
             System.exit(1);
         }
 
@@ -98,7 +98,7 @@ public class IoHiccupTest {
         try {
             latch.await(timeToWork + 1000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
-            Logger.getLogger(IoHiccupTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(jRTTest.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             exec.shutdownNow();
         }
@@ -136,7 +136,7 @@ public class IoHiccupTest {
                             return;
                         } catch (IOException ex) {
                             System.err.println("(" + url + ") ER: " + ex);
-                            Logger.getLogger(IoHiccupTest.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(jRTTest.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         ++i;
                     }

@@ -4,21 +4,21 @@
  * 
 
  */
-package org.iohiccup.socket.regular;
+package org.jrt.socket.regular;
 
 import java.util.Collections;
-import org.iohiccup.impl.IOHiccup;
-import org.iohiccup.socket.api.CodeWriter;
+import org.jrt.impl.JRT;
+import org.jrt.socket.api.CodeWriter;
 
 /**
  *
  * @author fijiol
  */
 public class JavaNetSocketCodeWrapper implements CodeWriter {
-    String time_provider_class = "org.iohiccup.socket.api.TimeProvider";
+    String time_provider_class = "org.jrt.socket.api.TimeProvider";
     String get_current_time = time_provider_class + ".getCurrentTime()";
-    String io_hiccup_static = "org.iohiccup.impl.IOHiccup";
-    public IOHiccup ioHiccup = null;
+    String jrt_static = "org.jrt.impl.JRT";
+    public JRT jRT = null;
     
     
     public String _getCurrentTime() {
@@ -66,7 +66,7 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
     }
     
     public String _debugWraps(String arg) {
-        if (ioHiccup.configuration.printExceptions) {
+        if (jRT.configuration.printExceptions) {
             return _rethrowWithPrint(arg);
         } else { 
             return arg;
@@ -74,18 +74,18 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
     }
     
     public String _uniqVar(String name) {
-        return ioHiccup.configuration.uuid.replaceAll("", "_") + name;
+        return jRT.configuration.uuid.replaceAll("", "_") + name;
     }
     
-    public String _ioHiccup() {
-        return "((org.iohiccup.impl.IOHiccup)" + io_hiccup_static + ".ioHiccupWorkers.get(" + _str(ioHiccup.configuration.uuid) + "))";
+    public String _jRT() {
+        return "((org.jrt.impl.JRT)" + jrt_static + ".jRTWorkers.get(" + _str(jRT.configuration.uuid) + "))";
     }
     
     public String _ioHic() {
-        return _ioHiccup() + ".sockHiccups.get(impl)";
+        return _jRT() + ".sockRTs.get(impl)";
     }
     
-    public String _saveIOHic(String ioHicValue) {
+    public String _saveJRTHic(String ioHicValue) {
         return _block( ioHicValue );
     }
     
@@ -105,13 +105,13 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
 
         if (methodName.equals("java.net.SocketInputStream.read(byte[],int,int,int)")) {
             return _debugWraps(
-                    Accumulator._readBefore(_ioHiccup(), _ioHic())
+                    Accumulator._readBefore(_jRT(), _ioHic())
             );
         }
 
         if (methodName.equals("java.net.SocketOutputStream.write(byte[],int,int)")) {
             return _debugWraps(
-                    Accumulator._writeBefore(_ioHiccup(), _ioHic())
+                    Accumulator._writeBefore(_jRT(), _ioHic())
             );
         }
 
@@ -129,21 +129,21 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
             methodName.equals("java.net.SocketOutputStream(java.net.AbstractPlainSocketImpl)")) {
             
             return _debugWraps(
-                    _saveIOHic(
-                            Accumulator._filter(_ioHiccup(), "impl", "impl.getInetAddress()", "impl.getPort()", "impl.getLocalPort()")
+                    _saveJRTHic(
+                            Accumulator._filter(_jRT(), "impl", "impl.getInetAddress()", "impl.getPort()", "impl.getLocalPort()")
                     )
             );
         }
         
        if (methodName.equals("java.net.SocketInputStream.read(byte[],int,int,int)")) {
             return _debugWraps(
-                    Accumulator._readAfter(_ioHiccup(), _ioHic())
+                    Accumulator._readAfter(_jRT(), _ioHic())
             );
         }
 
         if (methodName.equals("java.net.SocketOutputStream.write(byte[],int,int)")) {
             return _debugWraps(
-                    Accumulator._writeAfter(_ioHiccup(), _ioHic())
+                    Accumulator._writeAfter(_jRT(), _ioHic())
             );
         }
 
@@ -156,8 +156,8 @@ public class JavaNetSocketCodeWrapper implements CodeWriter {
     }
 
     @Override
-    public void init(IOHiccup ioHiccup) {
-        this.ioHiccup = ioHiccup;
+    public void init(JRT jRT) {
+        this.jRT = jRT;
     }
 
 }

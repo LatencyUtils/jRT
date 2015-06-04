@@ -4,11 +4,11 @@
  * 
 
  */
-package org.iohiccup.socket.mockup;
+package org.jrt.socket.mockup;
 
-import org.iohiccup.socket.api.*;
+import org.jrt.socket.api.*;
 import java.util.Collections;
-import org.iohiccup.impl.IOHiccup;
+import org.jrt.impl.JRT;
 
 /**
  *
@@ -17,7 +17,7 @@ import org.iohiccup.impl.IOHiccup;
 public class CodeWriterMockup implements CodeWriter {
     
     @Override
-    public void init(IOHiccup iOHiccup) {
+    public void init(JRT jrt) {
     }
     
     @Override

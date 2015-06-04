@@ -7,19 +7,19 @@ die() {
 
 ITSELF_PATH=$(dirname $(readlink -f $0))
 TEST=$ITSELF_PATH/tmp
-IOHICCUP=$ITSELF_PATH/../ioHiccup.jar
+JRT=$ITSELF_PATH/../jRT.jar
 
-file $IOHICCUP 2>&1 >/dev/null || die "ioHiccup was not built yet, please build it"
+file $JRT 2>&1 >/dev/null || die "jRT was not built yet, please build it"
 
 
 echo "Test run"
 
 rm -rf tmp
 mkdir -p tmp
-(cd tmp && cp -r $ITSELF_PATH/../ioHiccupTest/src/iohiccuptest/ ./)
-(cd tmp && javac iohiccuptest/IoHiccupTest.java)
-export _JAVA_OPTIONS="-javaagent:$IOHICCUP=-start=0,-si=100"
-(cd tmp && java -cp . iohiccuptest.IoHiccupTest -t:1999 -i:1999:500 -i:1999:540 &> test.log)
+(cd tmp && cp -r $ITSELF_PATH/../jRTTest/src/jrttest/ ./)
+(cd tmp && javac jrttest/jRTTest.java)
+export _JAVA_OPTIONS="-javaagent:$JRT=-start=0,-si=100"
+(cd tmp && java -cp . jrttest.jRTTest -t:1999 -i:1999:500 -i:1999:540 &> test.log)
 
 echo "Analysis..."
 

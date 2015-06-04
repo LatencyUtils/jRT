@@ -10,7 +10,7 @@
             <directory>${project.build.directory}</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>ioHiccup.jar</include>
+                <include>jRT.jar</include>
                 <include>javaassist*.jar</include>
             </includes>
         </fileSet>
@@ -19,9 +19,9 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>convert_all.sh</include>
-                <include>README</include>
-                <include>ioHiccupLogProcessor</include>
-                <include>ioHiccupPlotter.xls</include>
+                <include>README.md</include>
+                <include>jRTLogProcessor</include>
+                <include>jRTPlotter.xls</include>
             </includes>
         </fileSet>
     </fileSets>

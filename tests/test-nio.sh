@@ -6,7 +6,7 @@ die() {
 }
 
 ITSELF_PATH=$(dirname $(readlink -f $0))
-IOHICCUP=$ITSELF_PATH/../ioHiccup.jar
+JRT=$ITSELF_PATH/../jRT.jar
 TESTPATH=$ITSELF_PATH/./tmp/
 TEST=$TESTPATH/clj-async-tcp-echo-nio.2
 LEIN=lein
@@ -14,7 +14,7 @@ LEIN=lein
 which lein 2>&1 > /dev/null || die "There are no Leiningen in PATH, please install it following next instructures http://leiningen.org"
 lein -version 2>&1 | grep -q 'Leiningen 2' || die "Leiningen of wrong version $(lein -version), please install exactly 2.* version"
 which git 2>&1 > /dev/null || die "There are no git in PATH, please install it"
-file $IOHICCUP 2>&1 >/dev/null || die "ioHiccup was not built yet, please build it"
+file $JRT 2>&1 >/dev/null || die "jRT was not built yet, please build it"
 
 echo "Download test project"
 (
@@ -26,9 +26,9 @@ cd clj-async-tcp-echo-nio.2
 )
 
 echo "Test run"
-#export _JAVA_OPTIONS="-javaagent:$IOHICCUP=-start=0,-si=100,-lport=9500,-rport=9500"
+#export _JAVA_OPTIONS="-javaagent:$JRT=-start=0,-si=100,-lport=9500,-rport=9500"
 (
-export _JAVA_OPTIONS="-javaagent:$IOHICCUP=-start=0,-si=100"
+export _JAVA_OPTIONS="-javaagent:$JRT=-start=0,-si=100"
 cd $TEST
 lein test
 )

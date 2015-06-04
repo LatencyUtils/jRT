@@ -3,10 +3,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.azulsystems</groupId>
-    <artifactId>ioHiccup</artifactId>
+    <artifactId>jRT</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>ioHiccup</name>
+    <name>jRT</name>
 
     <url>http://some-site-here.org</url>
 
@@ -18,8 +18,8 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.template.file>src/main/java/org/iohiccup/Version.java.template</version.template.file>
-        <version.file>src/main/java/org/iohiccup/Version.java</version.file>
+        <version.template.file>src/main/java/org/jrt/Version.java.template</version.template.file>
+        <version.file>src/main/java/org/jrt/Version.java</version.file>
     </properties>    
 
     <build>
@@ -41,17 +41,17 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <finalName>ioHiccup</finalName>
+                    <finalName>jRT</finalName>
                     <archive>
                         <manifest>
                             <addClasspath>false</addClasspath>
-                            <mainClass>org.iohiccup.Attachermain</mainClass>
+                            <mainClass>org.jrt.Attachermain</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                         <manifestEntries>
-                            <Premain-Class>org.iohiccup.Agentmain</Premain-Class>
-                            <Agent-Class>org.iohiccup.Agentmain</Agent-Class>
+                            <Premain-Class>org.jrt.Agentmain</Premain-Class>
+                            <Agent-Class>org.jrt.Agentmain</Agent-Class>
                             <Class-Path>target/lib</Class-Path>
                             <Class-Path>lib</Class-Path>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
@@ -59,18 +59,6 @@
                     </archive>
                 </configuration>
             </plugin>
-
-            
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12.4</version>
-                <configuration>
-                    <enableAssertions>false</enableAssertions>
-                </configuration>
-            </plugin>
-            -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -104,7 +92,7 @@
                                     <artifactId>${project.artifactId}</artifactId>
                                     <version>${project.version}</version>
                                     <type>${project.packaging}</type>
-                                    <destFileName>ioHiccup.jar</destFileName>
+                                    <destFileName>jRT.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.basedir}</outputDirectory>
@@ -112,14 +100,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
-            -->
 
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
@@ -137,36 +117,24 @@
                                 <include>org.javassist:javassist</include>
                                 <include>org.hdrhistogram:*</include>
                                 <include>org.latencyutils:*</include>
-                                <!--
-                                <include>com.sun.tools:*</include>
-                                -->
                             </includes>
                             <rules>
                                 <rule>
                                     <pattern>javassist.**</pattern>
-                                    <result>org.iohiccup.internal.javassist.@1</result>
+                                    <result>org.jrt.internal.javassist.@1</result>
                                 </rule>
                                 <rule>
                                     <pattern>org.javassist.**</pattern>
-                                    <result>org.iohiccup.internal.javassist.@1</result>
+                                    <result>org.jrt.internal.javassist.@1</result>
                                 </rule>
                                 <rule>
                                     <pattern>org.HdrHistogram.**</pattern>
-                                    <result>org.iohiccup.internal.hdrhistogram.@1</result>
+                                    <result>org.jrt.internal.hdrhistogram.@1</result>
                                 </rule>
                                 <rule>
                                     <pattern>org.LatencyUtils.**</pattern>
-                                    <result>org.iohiccup.internal.latencyutils.@1</result>
+                                    <result>org.jrt.internal.latencyutils.@1</result>
                                 </rule>
-                                <!--
-                                <rule>
-                                    <pattern>com.sun.tools.**</pattern>
-                                    <result>org.iohiccup.internal.sun.attach.@1</result>
-
-                             <zipfileset>${java.home}/../lib/tools.jar</zipfileset>
-
-                                </rule>
-                                -->
                             </rules>
                         </configuration>
                     </execution>
@@ -218,38 +186,6 @@
                     </execution>
                 </executions>
             </plugin>
-            
-  <!--
-       <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-            <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-            <archive>
-                <index>true</index>
-                <manifest>
-                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                </manifest>
-                <manifestEntries>
-                    <Premain-Class>org.azulsystems.IOHiccup</Premain-Class>
-                </manifestEntries>
-            </archive>
-        </configuration>
-        <executions>
-            <execution>
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>single</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>       
-    -->     
-  
         </plugins>
     </build>
 
@@ -278,14 +214,6 @@
                 <artifactId>javassist</artifactId>
                 <version>3.19.0-GA</version>
         </dependency>
-        
-<!--        <dependency>
-                <groupId>javassist</groupId>
-                <artifactId>javassist</artifactId>
-                <version>3.12.1.GA</version>
-        </dependency>-->
-
-        
     </dependencies>
 
     <profiles>

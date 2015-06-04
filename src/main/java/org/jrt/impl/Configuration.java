@@ -4,7 +4,7 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup.impl;
+package org.jrt.impl;
 
 import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
@@ -14,13 +14,13 @@ import java.util.UUID;
 
 public class Configuration {
     
-    public String uuid = String.valueOf(++IOHiccup.hiccupInstances);
+    public String uuid = String.valueOf(++JRT.jrtInstances);
     
     public boolean i2oEnabled   = true;
     public boolean o2iEnabled   = true;
     public long logWriterInterval = 1000;
-    //equal to ioHiccup.jar=-lp=iohiccups.%d.%p-%h.%i
-    public String logPrefix = "iohiccups." +  (new SimpleDateFormat("MMddyy-hhmm")).format(new Date()) + "." + 
+    //equal to jRT.jar=-lp=jRTs.%d.%p-%h.%i
+    public String logPrefix = "jRTs." +  (new SimpleDateFormat("MMddyy-hhmm")).format(new Date()) + "." + 
             ManagementFactory.getRuntimeMXBean().getName().replace("@", "-") + 
 //                UUID.randomUUID() + 
                 "." + uuid;

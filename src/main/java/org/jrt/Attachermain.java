@@ -4,9 +4,9 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.jrt;
 
-import org.iohiccup.impl.IOHiccup;
+import org.jrt.impl.JRT;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
@@ -54,13 +54,13 @@ public class Attachermain {
         //validate agent arguments
         //print help message and exit if something is wrong
         {
-            (new IOHiccup()).parseArguments(agentArguments);
+            (new JRT()).parseArguments(agentArguments);
         }
         
         if (needHelp || null == pid) {
-            System.err.println("please, to attach ioHiccup to already running application rerun it in next manner:\n\n"
-                    + "\tjava -jar ioHiccup.jar -pid=<PID of java VM> -agentargs='<args>' \n\n");
-            IOHiccup.printHelpParameters();
+            System.err.println("please, to attach jRT to already running application rerun it in next manner:\n\n"
+                    + "\tjava -jar jRT.jar -pid=<PID of java VM> -agentargs='<args>' \n\n");
+            JRT.printHelpParameters();
             System.exit(1);
         }
         

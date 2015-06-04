@@ -4,9 +4,9 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup.impl;
+package org.jrt.impl;
 
-import org.iohiccup.socket.api.IOHic;
+import org.jrt.socket.api.JRTHic;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
 import java.util.ArrayList;
@@ -14,16 +14,16 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.LatencyUtils.LatencyStats;
-import org.iohiccup.socket.api.CodeWriter;
-import org.iohiccup.socket.api.Transformer;
-import org.iohiccup.socket.nio.NioSocketCodeWrapper;
-import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
+import org.jrt.socket.api.CodeWriter;
+import org.jrt.socket.api.Transformer;
+import org.jrt.socket.nio.NioSocketCodeWrapper;
+import org.jrt.socket.regular.JavaNetSocketCodeWrapper;
 
-public class IOHiccup {
+public class JRT {
 
     public static volatile boolean initialized = false;
     public static volatile boolean finishByError = false;
-    public static long hiccupInstances = 0;
+    public static long jrtInstances = 0;
     private static final String title = "";
     
     public long startTime;
@@ -32,13 +32,13 @@ public class IOHiccup {
     public boolean isAlive = true;
 
     public Configuration configuration = new Configuration();
-    public IOStatistic ioStat;
+    public JRTStatistic jrtStat;
     
-    public Map<Object, IOHic> sockHiccups = new ConcurrentHashMap(new WeakHashMap<Object, IOHic>());
+    public Map<Object, JRTHic> sockRTs = new ConcurrentHashMap(new WeakHashMap<Object, JRTHic>());
     
     public static void main(String[] args) {
-        System.out.println("ioHiccup.jar doesn't have now functional main method. Please rerun your application as:\n\t"
-                + "java -javaagent:ioHiccup.jar -jar yourapp.jar");
+        System.out.println("jRT.jar doesn't have now functional main method. Please rerun your application as:\n\t"
+                + "java -javaagent:jRT.jar -jar yourapp.jar");
         System.exit(1);
     }
 
@@ -60,7 +60,7 @@ public class IOHiccup {
     
     public static void printHelpAndExit() {
         System.out.println("Usage:");
-        System.out.println("\tjava -jar ioHiccup.jar[=<args>]  -jar yourapp.jar\n");
+        System.out.println("\tjava -jar jRT.jar[=<args>]  -jar yourapp.jar\n");
         printHelpParameters();
                 
         System.out.println("\n");
@@ -79,25 +79,25 @@ public class IOHiccup {
         System.out.println("\t\t  " + printKeys(localport, 40) + " to add filter by local port");
         System.out.println("\t\t  " + printKeys(filterentry, 40) + " to add filter by entry: <Local port>:<Remote address>:<Remote port> any part can be empty");
         System.out.println("\t\t  " + printKeys(loginterval, 40) + " to set log sampling interval");
-        System.out.println("\t\t  " + printKeys(startdelaying, 40) + " to specify time delay to start ioHiccup");
-        System.out.println("\t\t  " + printKeys(workingtime, 40) + " to specify how long ioHiccup will work");
-        System.out.println("\t\t  " + printKeys(logprefix, 40) + " to specify ioHiccup log prefix");
-        System.out.println("\t\t  " + printKeys(uuid, 40) + " to specify ioHiccup inner ID (take <string>)");
-        System.out.println("\t\t  " + printKeys(ioMode, 40) + " to specify ioHiccup mode. Expects one of i2o, o2i, both. Both by default");
+        System.out.println("\t\t  " + printKeys(startdelaying, 40) + " to specify time delay to start jRT");
+        System.out.println("\t\t  " + printKeys(workingtime, 40) + " to specify how long jRT will work");
+        System.out.println("\t\t  " + printKeys(logprefix, 40) + " to specify jRT log prefix");
+        System.out.println("\t\t  " + printKeys(uuid, 40) + " to specify jRT inner ID (take <string>)");
+        System.out.println("\t\t  " + printKeys(ioMode, 40) + " to specify jRT mode. Expects one of i2o, o2i, both. Both by default");
 //        System.out.println("\t\t  " + printKeys(i2oenabling, 40) + " to calculate latency (take <boolean>)");
 //        System.out.println("\t\t  " + printKeys(o2ienabling, 40) + " to calculate latency (take <boolean>)");
     }
     
-    public static ConcurrentHashMap<String, IOHiccup> ioHiccupWorkers = new ConcurrentHashMap<String, IOHiccup>();
+    public static ConcurrentHashMap<String, JRT> jRTWorkers = new ConcurrentHashMap<String, JRT>();
     
     public void premain(String agentArgument, Instrumentation instrumentation) {
-        ioStat = new IOStatistic();
+        jrtStat = new JRTStatistic();
 
         startTime = System.currentTimeMillis();
 
         parseArguments(agentArgument);
         
-        ioHiccupWorkers.put(configuration.uuid, this);
+        jRTWorkers.put(configuration.uuid, this);
         
         i2oLS = new LatencyStats();
         o2iLS = new LatencyStats();
@@ -109,19 +109,19 @@ public class IOHiccup {
 
             @Override
             public void run() {
-                synchronized (IOHiccup.title) {
+                synchronized (JRT.title) {
                     if (finishByError) {
                         return;
                     }
                     //TODO move/remove/improve
                     System.out.println("");
                     System.out.println("***************************************************************");
-                    System.out.println("ioHiccup configuration: ");
-                    System.out.println("ioHiccup uid " + configuration.uuid);
+                    System.out.println("jRT configuration: ");
+                    System.out.println("jRT uid " + configuration.uuid);
                     System.out.println("log files " + configuration.logPrefix + ".*");
                     System.out.println("---------------------------------------------------------------");
-                    System.out.println("ioHiccupStatistic: ");
-                    System.out.println(" " + ioStat.processedSocket + " sockets was processed");
+                    System.out.println("jRT Statistic: ");
+                    System.out.println(" " + jrtStat.processedSocket + " sockets was processed");
                     System.out.println("***************************************************************");
                     System.out.flush();
                 }
@@ -129,8 +129,8 @@ public class IOHiccup {
 
         });
 
-        LogWriter ioHiccupLogWriter = new LogWriter(this);
-        ioHiccupLogWriter.start();    
+        LogWriter jRTLogWriter = new LogWriter(this);
+        jRTLogWriter.start();    
     }
 
     public void parseArguments(String agentArgument) throws NumberFormatException {
@@ -138,7 +138,7 @@ public class IOHiccup {
             for (String v : agentArgument.split(",")) {
                 String[] vArr = v.split("=");
                 if (vArr.length > 2) {
-                    System.out.println("Wrong format ioHiccup arguments.\n");
+                    System.out.println("Wrong format jRT arguments.\n");
                     printHelpAndExit();
                 }
                 if (hasKey(help, vArr[0])) {
@@ -264,23 +264,23 @@ public class IOHiccup {
         
     }
     
-    public static IOHiccup premain0(String agentArgument, Instrumentation instrumentation) {
+    public static JRT premain0(String agentArgument, Instrumentation instrumentation) {
         
         //Check here another instances and exit if then!
         if (initialized) {
-            System.out.println("WARNING: multiple instances of ioHiccup was ran. (It's not well tested yet)");
-            //System.err.println("\nTrying to run multiple instances of ioHiccup simultaneously.\n"
+            System.out.println("WARNING: multiple instances of jRT was ran. (It's not well tested yet)");
+            //System.err.println("\nTrying to run multiple instances of jRT simultaneously.\n"
             //        + "\nPlease run only one at the same time.\n\n");
             //finishByError = true;
             //System.exit(1);
         }
         
-        IOHiccup ioHiccup = new IOHiccup();
-        ioHiccup.premain(agentArgument, instrumentation);
+        JRT jRT = new JRT();
+        jRT.premain(agentArgument, instrumentation);
         
         initialized = true;
         
-        return ioHiccup;
+        return jRT;
     }
     
     private static final String[] remoteaddr = {"-raddr", "remote-addr"};

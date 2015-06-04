@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# ioHiccupLogProcessor
+# jRTLogProcessor
 #
 # Written by Gil Tene, and released to the public domain, as explained at
 #  http://creativecommons.org/publicdomain/zero/1.0/
 #
-IOHICCUP_Version=2.0.1
+JRT_Version=2.0.1
 #
-# ioHiccupLogProcessor will process an inpit log and can generate two
-# different log files from a single ioHiccup histogram log file: a
+# jRTLogProcessor will process an inpit log and can generate two
+# different log files from a single jRT histogram log file: a
 # sequential interval log file and a histogram log file.
 #
 # The sequential interval log file logs a single %'ile stats line for
@@ -17,23 +17,23 @@ IOHICCUP_Version=2.0.1
 # The histogram percentile log file includes a detailed %'ile histogram
 # of the entire log file range.
 #
-# ioHiccupLogProcessor will process an input log file when provided with
+# jRTLogProcessor will process an input log file when provided with
 # the -i <filename> option. When no -i option is provided, standard input
 # will be processed.
 #
 # When provided with an output file name <logfile> with the -o option
-# (e.g. "-o mylog"), ioHiccupLogProcessor will produce both output files
+# (e.g. "-o mylog"), jRTLogProcessor will produce both output files
 # under the names <logfile> and <logfile>.hgrm (e.g. mylog and mylog.hgrm).
 #
-# When not provided with an output file name, ioHiccupLogProcessor will
+# When not provided with an output file name, jRTLogProcessor will
 # produce [only] the histogram percentile log output to standard output.
 #
-# ioHiccupLogProcessor accepts optional -start and -end time range
+# jRTLogProcessor accepts optional -start and -end time range
 # parameters. When provided, the output will only reflect the portion
 # of the input log with timestamps that fall within the provided start
 # and end time range parameters.
 #
-# ioHiccupLogProcessor also accepts and optional -csv parameter, which
+# jRTLogProcessor also accepts and optional -csv parameter, which
 # will cause the output formatting (of both output file forms) to use
 # a CSV file format.
 #
@@ -46,12 +46,12 @@ IOHICCUP_Version=2.0.1
 function readlink_f () { _=`pwd`; cd `dirname $1` && echo `pwd` && cd $_; }
 INSTALLED_PATH=$(readlink_f $0)
 
-# Check if running from unpacked distribution archive by assuming ioHiccup.jar
+# Check if running from unpacked distribution archive by assuming jRT.jar
 # in the same directory as this script. If not, try to search in target/ directory
 # (running from the source repository build).
-IOHICCUP_JAR_FILE=$INSTALLED_PATH/ioHiccup.jar
-if [ ! -f $IOHICCUP_JAR_FILE ] ; then
-  IOHICCUP_JAR_FILE=$INSTALLED_PATH/target/ioHiccup.jar
+JRT_JAR_FILE=$INSTALLED_PATH/jRT.jar
+if [ ! -f $JRT_JAR_FILE ] ; then
+  JRT_JAR_FILE=$INSTALLED_PATH/target/jRT.jar
 fi
 
 JAVA_BIN=`which java`
@@ -75,12 +75,12 @@ fi
 
 # Deal with Windows/cygwin path normalization syntax needs:
 # Key Assumption: only cygwin/Windows installations will have a cygpath command...
-cygpath -w $IOHICCUP_JAR_FILE &> /dev/null
+cygpath -w $JRT_JAR_FILE &> /dev/null
 if [ $? -eq 0 ] ; then
     # if using cygwin, use valid windows-style classpath
-    IOHICCUP_JAR_FILE=`cygpath -w $IOHICCUP_JAR_FILE`
-	echo Windows path for hiccup jar file is $IOHICCUP_JAR_FILE
+    JRT_JAR_FILE=`cygpath -w $JRT_JAR_FILE`
+	echo Windows path for jRT jar file is $JRT_JAR_FILE
 fi
 
-exec $JAVA_CMD -cp $IOHICCUP_JAR_FILE org.iohiccup.internal.hdrhistogram.HistogramLogProcessor $@
+exec $JAVA_CMD -cp $JRT_JAR_FILE org.jrt.internal.hdrhistogram.HistogramLogProcessor $@
 #exec $CMD

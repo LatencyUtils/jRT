@@ -4,7 +4,7 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup.socket.mockup;
+package org.jrt.socket.mockup;
 
 public class Socket {
     private int fd;

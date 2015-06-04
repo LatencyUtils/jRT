@@ -4,9 +4,9 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup.socket.api;
+package org.jrt.socket.api;
 
-public class IOHic {
+public class JRTHic {
     public long i2oLatency;
     public long i2oReadTime;
     public long i2oWriteTime;

@@ -4,9 +4,9 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup;
+package org.jrt;
 
-import org.iohiccup.impl.IOHiccup;
+import org.jrt.impl.JRT;
 import java.lang.instrument.Instrumentation;
 
 import java.util.jar.JarFile;
@@ -18,7 +18,7 @@ public class Agentmain {
         commonmain(agentArgument, instrumentation);
 
         try {
-            IOHiccup.premain0(agentArgument, instrumentation);
+            JRT.premain0(agentArgument, instrumentation);
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -42,7 +42,7 @@ public class Agentmain {
         commonmain(agentArgument, instrumentation);
         
         try {
-            IOHiccup.premain0(agentArgument, instrumentation);
+            JRT.premain0(agentArgument, instrumentation);
         } catch (Throwable t) {
             t.printStackTrace();
         }

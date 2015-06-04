@@ -4,11 +4,11 @@
  * 
 
  */
-package org.iohiccup.socket.nio;
+package org.jrt.socket.nio;
 
-import org.iohiccup.impl.IOHiccup;
-import org.iohiccup.socket.regular.Accumulator;
-import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
+import org.jrt.impl.JRT;
+import org.jrt.socket.regular.Accumulator;
+import org.jrt.socket.regular.JavaNetSocketCodeWrapper;
 
 /**
  *
@@ -17,8 +17,8 @@ import org.iohiccup.socket.regular.JavaNetSocketCodeWrapper;
 public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
 
     @Override
-    public void init(IOHiccup ioHiccup) {
-        super.init(ioHiccup);
+    public void init(JRT jRT) {
+        super.init(jRT);
     }
 
     @Override
@@ -38,47 +38,47 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
         if (methodName.equals("sun.nio.ch.SocketChannelImpl(java.nio.channels.spi.SelectorProvider,java.io.FileDescriptor,java.net.InetSocketAddress)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
-                    Accumulator._filter(_ioHiccup(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
+                    Accumulator._filter(_jRT(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
             );
         }
 
         if (methodName.equals("sun.nio.ch.SocketChannelImpl.connect(java.net.SocketAddress)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
-                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
+                    Accumulator._filter(_jRT(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
             );
         }
 
         if (methodName.equals("sun.nio.ch.AsynchronousSocketChannelImpl(sun.nio.ch.AsynchronousChannelGroupImpl,java.io.FileDescriptor,java.net.InetSocketAddress)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
-                    Accumulator._filter(_ioHiccup(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
+                    Accumulator._filter(_jRT(), "fd", "remoteAddress.getAddress()", "remoteAddress.getPort()", "localAddress.getPort()")
             );
         }
 
         if (methodName.equals("sun.nio.ch.AsynchronousSocketChannelImpl.connect(java.net.SocketAddress)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
-                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
+                    Accumulator._filter(_jRT(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
             );
         }
 
         if (methodName.equals("sun.nio.ch.AsynchronousSocketChannelImpl.connect(java.net.SocketAddress,java.lang.Object,java.nio.channels.CompletionHandler)")) {
             return _block(
                     //ENSURE that fd everywhere can be get!
-                    Accumulator._filter(_ioHiccup(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
+                    Accumulator._filter(_jRT(), "fd", "((java.net.InetSocketAddress)$1).getAddress()", "((java.net.InetSocketAddress)$1).getPort()", "0")
             );
         }
 
         if (methodName.contains("sun.nio.ch.IOUtil.read(java.io.FileDescriptor,")) {
             return _debugWraps(
-                    Accumulator._readAfter(_ioHiccup(), _ioHic())
+                    Accumulator._readAfter(_jRT(), _ioHic())
             );
         }
 
         if (methodName.contains("sun.nio.ch.IOUtil.write(java.io.FileDescriptor,")) {
             return _debugWraps(
-                    Accumulator._writeAfter(_ioHiccup(), _ioHic())
+                    Accumulator._writeAfter(_jRT(), _ioHic())
             );
         }
         
@@ -94,13 +94,13 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
         if (methodName.contains("sun.nio.ch.IOUtil.read(java.io.FileDescriptor,")) {
             
             return _debugWraps(
-                    Accumulator._readBefore(_ioHiccup(), _ioHic())
+                    Accumulator._readBefore(_jRT(), _ioHic())
             );
         }
 
         if (methodName.contains("sun.nio.ch.IOUtil.write(java.io.FileDescriptor,")) {
             return _debugWraps(
-                    Accumulator._writeBefore(_ioHiccup(), _ioHic())
+                    Accumulator._writeBefore(_jRT(), _ioHic())
             );
         }
 
@@ -110,9 +110,9 @@ public class NioSocketCodeWrapper extends JavaNetSocketCodeWrapper {
     
     @Override
     public String _ioHic() {
-        // return _ioHiccup() + ".sockHiccups.get(fd)"; // <-- Expected fd ~ $1
+        // return _jRT() + ".sockRTs.get(fd)"; // <-- Expected fd ~ $1
         // Code below is correct, because we used it only while redefine read/write functions that get FileDescriptor as first argument
-        return _ioHiccup() + ".sockHiccups.get($1)";
+        return _jRT() + ".sockRTs.get($1)";
     }
     
        

@@ -7,6 +7,6 @@
 *.hgrm
 *.class
 Version.java
-/ioHiccupTest/build/
-/ioHiccupTest/nbproject/private/
-/ioHiccupTest/dist/
+/jRTTest/build/
+/jRTTest/dist/
+/jRTTest/nbproject/private/

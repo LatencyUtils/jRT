@@ -4,9 +4,9 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup.socket.api;
+package org.jrt.socket.api;
 
-import org.iohiccup.impl.IOHiccup;
+import org.jrt.impl.JRT;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Arrays;
 import javassist.ClassPool;
@@ -19,16 +19,16 @@ public class Transformer implements ClassFileTransformer {
     private static boolean traceClasses = false;
     private static boolean traceMethods = false;
             
-    private final IOHiccup iOHiccup;
+    private final JRT jrt;
     
     private final CodeWriter codeWriter;
 
 
-    public Transformer(IOHiccup iOHiccup, CodeWriter codeWriter) {
-        this.iOHiccup = iOHiccup;
+    public Transformer(JRT jrt, CodeWriter codeWriter) {
+        this.jrt = jrt;
         this.codeWriter = codeWriter;
         
-        codeWriter.init(iOHiccup);
+        codeWriter.init(jrt);
     }
     
     @Override

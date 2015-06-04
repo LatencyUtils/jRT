@@ -4,9 +4,9 @@
  * 
 
  */
-package org.iohiccup.socket.api;
+package org.jrt.socket.api;
 
-import org.iohiccup.impl.IOHiccup;
+import org.jrt.impl.JRT;
 
 /**
  *
@@ -14,9 +14,9 @@ import org.iohiccup.impl.IOHiccup;
  */
 public interface CodeWriter {
     
-    // place to do some preconditions here, like to put ioHiccup to some place
+    // place to do some preconditions here, like to put jRT to some place
     // visible to instrumented code
-    public void init(IOHiccup iOHiccup);
+    public void init(JRT jrt);
     
     public boolean needInstrument(String className);
 

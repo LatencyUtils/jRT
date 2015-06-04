@@ -4,9 +4,9 @@
  *
  * @author Fedor Burdun
  */
-package org.iohiccup.impl;
+package org.jrt.impl;
 
-public class IOStatistic {
+public class JRTStatistic {
     public long processedSocket;
     public long startTime;
     public long endTime;

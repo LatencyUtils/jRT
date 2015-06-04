@@ -4,10 +4,10 @@
  *
  * @author Fedor Burdun
  */
+package org.jrt.socket.api;
 
-package org.iohiccup;
-
-public final class Version {
-    public static final String version="$VERSION$";
-    public static final String build_time="$BUILD_TIME$";
+public class TimeProvider {
+    public static long getCurrentTime() {
+        return System.nanoTime();
+    }
 }
